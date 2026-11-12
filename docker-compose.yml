@@ -1,0 +1,27 @@
+# Full stack (prod-like): web (nginx) → api (express) → db (postgres)
+name: meeting-manager
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-meeting}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-meeting}
+      POSTGRES_DB: ${POSTGRES_DB:-meeting}
+    volumes: [db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-meeting}"]
+      interval: 5s
+      retries: 10
+  api:
+    build: { context: ./backend, target: prod }
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-meeting}:${POSTGRES_PASSWORD:-meeting}@db:5432/${POSTGRES_DB:-meeting}
+    depends_on:
+      db: { condition: service_healthy }
+  web:
+    build: { context: ./frontend, target: prod }
+    ports: ["${WEB_PORT:-8080}:80"]
+    depends_on: [api]
+volumes:
+  db-data:
