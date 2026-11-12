@@ -10,8 +10,8 @@ meeting-manager/                  <- this repo (compose, Makefile, CI)
 ├── docker-compose.yml            full stack, prod-like (web :8080 -> api -> db)
 ├── docker-compose.dev.yml        dev override: hot reload, ports 5173 / 3000 / 5432
 ├── Makefile
-├── requirement/                  original assignment brief
 └── docs/
+    ├── requirement/              original assignment brief
     ├── design/                   design guidelines + tokens
     ├── AI-thinks/                architecture proposals (claude / codex / cursor)
     └── discussion/               cross-reviews, summary, final decision
