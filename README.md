@@ -9,8 +9,12 @@ meeting-manager/                  <- this repo (compose, Makefile, CI)
 ├── frontend/  -> github.com/Mrdiamond096/meeting-manager-frontend  (React + Vite, nginx in prod)
 ├── docker-compose.yml            full stack, prod-like (web :8080 -> api -> db)
 ├── docker-compose.dev.yml        dev override: hot reload, ports 5173 / 3000 / 5432
-├── scripts/bootstrap-github.sh   one-time repo creation + submodule wiring
-└── Makefile
+├── Makefile
+├── requirement/                  original assignment brief
+└── docs/
+    ├── design/                   design guidelines + tokens
+    ├── AI-thinks/                architecture proposals (claude / codex / cursor)
+    └── discussion/               cross-reviews, summary, final decision
 ```
 
 ## Clone
