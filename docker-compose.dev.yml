@@ -2,7 +2,7 @@
 # docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 services:
   db:
-    ports: ["5432:5432"]
+    ports: ["${DB_PORT:-5432}:5432"]
   api:
     build: { target: dev }
     ports: ["3000:3000"]
