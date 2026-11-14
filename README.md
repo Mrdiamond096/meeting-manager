@@ -6,9 +6,9 @@ mounted here as **git submodules**, so you can work on the whole stack or clone 
 ```
 meeting-manager/                  <- this repo (compose, Makefile, CI)
 ├── backend/   -> github.com/Mrdiamond096/meeting-manager-backend   (Express + Postgres)
-├── frontend/  -> github.com/Mrdiamond096/meeting-manager-frontend  (React + Vite, nginx in prod)
+├── frontend/  -> github.com/Mrdiamond096/meeting-manager-frontend  (Next.js, standalone server in prod)
 ├── docker-compose.yml            full stack, prod-like (web :8080 -> api -> db)
-├── docker-compose.dev.yml        dev override: hot reload, ports 5173 / 3000 / 5432
+├── docker-compose.dev.yml        dev override: hot reload, ports 3001 / 3000 / 5432
 ├── Makefile
 └── docs/
     ├── requirement/              original assignment brief
@@ -32,7 +32,7 @@ Each sub-repo has its own `Dockerfile`, `docker-compose.yml` and `Makefile`, so 
 ```bash
 make init     # pull submodules + create .env
 make up       # full stack -> http://localhost:8080
-make dev      # hot-reload stack -> http://localhost:5173
+make dev      # hot-reload stack -> http://localhost:3001
 make test     # all tests
 make down
 make help     # every target

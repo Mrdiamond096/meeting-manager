@@ -1,13 +1,25 @@
-name: ci
-on: [push, pull_request]
+name: Full stack
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
-  test-and-build:
+  compose-smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { submodules: recursive }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: make install
-      - run: make test
-      - run: make build
+        with:
+          submodules: recursive
+      - run: cp .env.example .env
+      - run: docker compose up -d --build --wait
+      - run: curl -fsS http://localhost:8080/api/health/ready
+      - run: curl -fsS http://localhost:8080 | grep -q "Upcoming Meetings"
+      - if: failure()
+        run: docker compose logs
+      - if: always()
+        run: docker compose down -v

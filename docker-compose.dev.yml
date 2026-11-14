@@ -10,6 +10,6 @@ services:
   web:
     build: { target: dev }
     environment:
-      VITE_API_PROXY: http://api:3000
-    ports: ["5173:5173"]
+      API_URL: http://api:3000
+    ports: ["3001:3001"]
     volumes: [./frontend/src:/app/src]

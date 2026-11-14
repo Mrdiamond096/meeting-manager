@@ -35,7 +35,7 @@ logs: ## Follow logs (SVC=api|web|db)
 	$(COMPOSE) logs -f $(SVC)
 
 # ---------- docker: dev (hot reload) ----------
-dev: ## Start dev stack -> web :5173, api :3000, db :5432
+dev: ## Start dev stack -> web :3001, api :3000, db :5432
 	$(COMPOSE_DEV) up -d --build
 dev-down: ## Stop dev stack
 	$(COMPOSE_DEV) down

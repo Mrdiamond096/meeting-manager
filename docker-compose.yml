@@ -1,4 +1,4 @@
-# Full stack (prod-like): web (nginx) → api (express) → db (postgres)
+# Full stack (prod-like): web (next.js) → api (express) → db (postgres)
 name: meeting-manager
 services:
   db:
@@ -12,6 +12,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-meeting}"]
       interval: 5s
       retries: 10
+    restart: unless-stopped
   api:
     build: { context: ./backend, target: prod }
     environment:
@@ -19,9 +20,19 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-meeting}:${POSTGRES_PASSWORD:-meeting}@db:5432/${POSTGRES_DB:-meeting}
     depends_on:
       db: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health/ready || exit 1"]
+      interval: 10s
+      retries: 5
+    restart: unless-stopped
   web:
-    build: { context: ./frontend, target: prod }
-    ports: ["${WEB_PORT:-8080}:80"]
-    depends_on: [api]
+    build:
+      context: ./frontend
+      target: prod
+      args: { API_URL: http://api:3000 }
+    ports: ["${WEB_PORT:-8080}:3000"]
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
 volumes:
   db-data:
