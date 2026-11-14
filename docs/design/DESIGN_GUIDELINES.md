@@ -1,7 +1,7 @@
 # Design Guidelines — Candidate Meeting Scheduler
 
 ธีม: **Lagoon**
-สแตก UI: React + TypeScript + Vite · Tailwind CSS v4 · shadcn/ui (Radix) · lucide-react icons
+สแตก UI: Next.js 15 (App Router) + TypeScript · Tailwind CSS v4 · shadcn/ui (Radix) · lucide-react icons
 
 ไฟล์ที่เกี่ยวข้อง
 - `tokens/globals.css`: token ทั้งหมดสำหรับ Tailwind/shadcn (light + dark)
@@ -41,7 +41,9 @@
 | Confirmed | `success` `#1E6B3A` | `success-subtle` `#E6F4EA` | `CircleCheck` |
 | Pending | `warning` `#8A5A00` | `warning-subtle` `#FDF3DC` | `Clock` |
 | Cancelled | `destructive` `#B42318` | `destructive-subtle` `#FDECEA` | `CircleX` |
-| Completed | `info` `#475467` | `info-subtle` `#EEF1F5` | `CircleDot` |
+| Past (ไม่ใช่ status — แสดงเมื่อเวลานัดผ่านไปแล้ว) | `info` `#475467` | `info-subtle` `#EEF1F5` | `History` |
+
+Status มี 3 ค่าเท่านั้น (PENDING / CONFIRMED / CANCELLED) — ไม่มี Completed
 
 ### Contrast (ตรวจแล้ว ผ่าน WCAG AA ทุกคู่)
 
@@ -63,7 +65,7 @@
 
 ## 3. Typography
 
-- ฟอนต์: **Inter** สำหรับ UI และตัวเลข, **IBM Plex Sans Thai** เป็น fallback เมื่อมีชื่อหรือโน้ตภาษาไทย โหลดผ่าน `@fontsource` หรือ Google Fonts
+- ฟอนต์: **Inter** สำหรับ UI และตัวเลข, **IBM Plex Sans Thai** สำหรับ UI ภาษาไทย (แอปรองรับ EN/TH) โหลดผ่าน `@fontsource` หรือ Google Fonts
 - ตัวเลข วันที่ และเวลา ให้ใส่ class `tabular` (tabular-nums) เพื่อให้ตัวเลขตรงคอลัมน์
 
 | Role | Size / Line-height | Weight | Tailwind |
@@ -95,15 +97,28 @@
 │ Pagination                                                       │
 └──────────────────────────────────────────────────────────────────┘
 ```
-ใช้ top bar อย่างเดียว ไม่มี sidebar เพราะมีเพียงสี่หน้า การนำทางจึงสั้นและชัดกว่า
+ใช้ top bar อย่างเดียว ไม่มี sidebar เพราะหน้าหลักมีน้อย การนำทางจึงสั้นและชัดกว่า Top bar มีตัวสลับภาษา EN/TH และเมนูผู้ใช้ (Logout)
+
+**โลโก้ (ชั่วคราว):** โลโก้ EGG Digital บนพื้น Yolk ตามที่ผู้ใช้กำหนด จะเปลี่ยนภายหลัง
+
+**ภาษา:** ข้อความภาษาไทยมักยาวกว่าอังกฤษ ปุ่มและ label ต้องไม่ fix ความกว้าง และต้องตรวจทั้งสองภาษา
 
 ## 6. Component ต่อหน้าจอ
 
 ### 6.1 Login
 - การ์ดกลางจอ กว้าง `max-w-sm` มีโลโก้และชื่อ "Candidate Meeting Scheduler"
 - Email + Password (shadcn `Input` + `Label`), ปุ่ม **Login** แบบ `primary` เต็มความกว้าง
-- "Continue as Guest" ใช้ปุ่ม `ghost`
-- Error แสดงเป็น inline `Alert` สี destructive-subtle ใต้ฟอร์ม
+- ลิงก์ "Create account" และ "Forgot password?" (ไม่มี Continue as Guest ในรอบนี้ — future work)
+- Error แสดงเป็น inline `Alert` สี destructive-subtle ใต้ฟอร์ม ข้อความ login ผิดเป็นข้อความเดียวเสมอ (ไม่บอกว่า email มีหรือไม่)
+
+### 6.1a OTP verify
+- การ์ดเดียวกับ Login, input 6 ช่อง (ตัวเลข, paste ทั้ง 6 หลักได้, `autocomplete="one-time-code"`)
+- hint ชัดเจน "Demo OTP: 112233" (ระบบใช้ OTP แบบ mock)
+- state: ผิด (แสดงจำนวนครั้งที่เหลือ), ผิดครบ 5 ครั้งหรือหมดอายุ (กลับไปเริ่มใหม่), 429
+
+### 6.1b Register / Forgot / Reset password
+- Register: Email, Password (≥ 8 ตัว มีปุ่มแสดง/ซ่อน), Confirm password → OTP
+- Forgot: Email → ข้อความเดียวกันเสมอ "ถ้ามีบัญชีนี้ เราได้ส่ง OTP แล้ว" → Reset: OTP + Password ใหม่
 
 ### 6.2 Dashboard — Upcoming Meetings
 - Header: "Upcoming Meetings" + จำนวนนัด + ปุ่ม **Schedule meeting** (primary)
@@ -126,7 +141,7 @@
 
 ### 6.3 Booking Form — Schedule a New Meeting
 - ฟอร์มคอลัมน์เดียว `max-w-2xl` แบ่งเป็นกลุ่มด้วยหัวข้อ: Candidate · Schedule · Details
-- Candidate Name: `Combobox` (autocomplete และพิมพ์ชื่อใหม่ได้)
+- Candidate: `Combobox` ค้นหา candidate เดิม (แสดงชื่อ + ตำแหน่ง + วันที่สร้าง เพื่อแยกคนชื่อซ้ำ) และตัวเลือก **"+ Create new candidate"** แบบ explicit — ไม่ผูก candidate ด้วยชื่ออัตโนมัติ (ADR-006)
 - Position: `Select` (Software Engineer, Backend, Frontend, …)
 - Date: `Popover` + `Calendar`; Start/End time: `Select` ทีละ 15 นาที วางคู่กันในแถวเดียว
 - Meeting type: `RadioGroup` แบบ card (Onsite / Online) ถ้าเลือก Online จะแสดงช่องเลือก Zoom หรือ Google Meet
@@ -137,9 +152,10 @@
 ### 6.4 Candidate Summary
 - Header: Avatar ใหญ่ + ชื่อ + role + status badge ของนัดล่าสุด ปุ่มทางขวาคือ Edit Meeting (`outline`), Cancel Meeting (`ghost` สี destructive), Add Feedback (`primary`)
 - Layout แบบ 2 คอลัมน์บน `lg` (ซ้าย 2/3, ขวา 1/3)
-  - ซ้าย: **Meeting Info** (การ์ด) และ **Interview Notes** (Textarea + Save)
-  - ขวา: **History** เป็น timeline แนวตั้ง แต่ละรายการมีวันที่ ประเภทรอบ และผลการประเมิน
-- Cancel Meeting และ Delete ต้องผ่าน `AlertDialog` ยืนยันเสมอ ปุ่มยืนยันใช้ variant `destructive`
+  - ซ้าย: **Meeting Info** (การ์ด) และ **Interview Notes / Feedback** (รายการที่มี timestamp + ช่องเพิ่ม feedback ใหม่ แบบ append-only)
+  - ขวา: **History** เป็น timeline แนวตั้งของ meeting ที่ผ่านไปแล้ว (วันที่ + status + จำนวน feedback) — ไม่มีคะแนนประเมิน
+- Cancel Meeting และ Delete ต้องผ่าน `AlertDialog` ยืนยันเสมอ ปุ่มยืนยันใช้ variant `destructive` (Cancel เก็บประวัติไว้, Delete ลบถาวร)
+- ถ้าข้อมูลถูกแก้จากที่อื่น (409) แสดง dialog "This meeting was updated elsewhere" + ปุ่ม Reload
 
 ## 7. ปุ่ม (Button variants)
 
@@ -168,7 +184,7 @@
 
 ## 10. Workflow: Figma ↔ Code
 1. สร้าง Figma Variables จาก `tokens/tokens.json` (collection `color` มี 2 modes: Light/Dark และ collection `radius`/`spacing`)
-2. วาด wireframe 4 หน้าตามข้อ 6 ด้วย component ที่ผูก variable ไว้ แล้ว export PNG ไว้ที่ `docs/design/screens/`
-3. ฝั่งโค้ด: `npx shadcn@latest init` → แทน `src/styles/globals.css` ด้วย `tokens/globals.css` → `npx shadcn@latest add button input label select textarea calendar popover radio-group toggle-group badge card dialog alert-dialog pagination skeleton sonner avatar`
-4. เพิ่ม Badge variants `success | warning | destructive | info` ใน `components/ui/badge.tsx` ให้ map กับตารางสถานะข้อ 2
+2. วาดหน้าจอตามข้อ 6 (desktop 1440 + mobile 390, EN/TH) ด้วย component ที่ผูก variable ไว้ แล้ว export PNG ไว้ที่ `docs/design/screens/` — แผนเต็มอยู่ที่ `docs/discussion/finally/figma-design-plan.md`
+3. ฝั่งโค้ด: `npx shadcn@latest init` → แทน `src/app/globals.css` ด้วย `tokens/globals.css` → `npx shadcn@latest add button input label select textarea calendar popover radio-group toggle-group badge card dialog alert-dialog pagination skeleton sonner avatar`
+4. เพิ่ม Badge variants `success | warning | destructive | info` (info ใช้กับ Past) ใน `components/ui/badge.tsx` ให้ map กับตารางสถานะข้อ 2
 5. เมื่อเปลี่ยนสีใด ให้แก้ทั้ง `globals.css` และ `tokens.json` ใน commit เดียวกัน

@@ -1,7 +1,7 @@
 /*
  * Candidate Meeting Scheduler — Theme "Lagoon"
  * Tailwind CSS v4 + shadcn/ui token format
- * วางไฟล์นี้ที่ apps/web/src/styles/globals.css แล้ว import ใน main.tsx
+ * คัดลอกไปที่ frontend/src/app/globals.css แล้ว import ใน src/app/layout.tsx
  */
 @import "tailwindcss";
 
