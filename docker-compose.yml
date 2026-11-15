@@ -18,6 +18,14 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: postgres://${POSTGRES_USER:-meeting}:${POSTGRES_PASSWORD:-meeting}@db:5432/${POSTGRES_DB:-meeting}
+      APP_VERSION: ${APP_VERSION:-local}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8080}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      # Local demo only: the production image refuses the mock OTP unless explicitly allowed (ADR-009).
+      OTP_PROVIDER: mock
+      OTP_MOCK_CODE: ${OTP_MOCK_CODE:-112233}
+      ALLOW_MOCK_OTP: "true"
     depends_on:
       db: { condition: service_healthy }
     healthcheck:

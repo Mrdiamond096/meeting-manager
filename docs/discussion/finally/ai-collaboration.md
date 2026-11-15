@@ -10,7 +10,7 @@
 | **Codex** | **WS-A** Meetings & Candidates & Feedback (A1–A3 + `view=range`/`mine` ของ ADR-014) | backend `feature/ws-a-*` | proposal ของ Codex ได้คะแนน backend/data สูงสุด (comparison-matrix) |
 | **Cursor** | **WS-B** Auth (B1–B3) | backend `feature/ws-b-*` | แยก module ชัด (`src/modules/auth`), มี checklist ADR-009/013 ครบ; ผู้ใช้รีวิวละเอียดที่สุด + Claude รีวิวก่อนส่ง |
 
-**ลำดับ:** Codex และ Cursor เริ่มได้ทันทีโดย **แตก branch จาก `feature/phase-1-infra`** ([backend PR #1](https://github.com/Mrdiamond096/meeting-manager-backend/pull/1)) แล้ว rebase บน `main` เมื่อ R1 merge (เดิมกำหนดให้รอ R1)
+**ลำดับ:** Phase 1 merge แล้ว ([backend PR #1](https://github.com/Mrdiamond096/meeting-manager-backend/pull/1)) — Codex และ Cursor **แตก branch จาก `main`** ได้เลย
 ผู้ใช้รีวิวทุก PR; AI ไม่ merge เอง
 
 ## 2. กติการ่วม (ทุก AI ต้องทำตาม)
@@ -22,7 +22,8 @@
 5. **ขนาด PR:** ≤ ~400 บรรทัดที่ไม่ใช่ test/migration; 1 milestone = 1 PR
 6. **Definition of done:** `npm run typecheck && npm test && npm run build` ผ่าน · test ครอบ acceptance ของ milestone · PR description มี: ทำอะไร, test อะไร, trade-off, สิ่งที่ยังไม่ทำ
 7. **ภาษา:** โค้ด, commit, PR เป็นภาษาอังกฤษ; ข้อความ UI มีทั้ง EN/TH ตาม Figma
-8. **Logging/Error:** ใช้ `AppError` + error middleware และ logger จาก `src/observability` เท่านั้น ห้าม `console.log`; 4xx log ระดับ `info`, 5xx `error` (ADR-012); ห้าม log password, OTP, cookie, request body
+8. **Logging/Error:** ใช้ `AppError` + error middleware และ logger จาก `src/observability` เท่านั้น ห้าม `console.log`; 4xx log ระดับ `info`, 5xx `error` (ADR-012); ห้าม log password, OTP, cookie, token, **email**, request body — อ้างถึงผู้ใช้ด้วย `userId` / `challengeId`
+11. **Node 24** (`.nvmrc`) — สลับด้วย `nvm use` ก่อนเริ่ม; ใช้ DB แยกสำหรับ test เพราะ `resetDb()` truncate ทุกตาราง (อย่าชี้ไปที่ DB ของ `make up`)
 9. **Time:** เก็บ/ส่งเป็น ISO 8601 UTC instant; แสดงผลตาม timezone ของ browser (ADR-005)
 10. ไม่แน่ใจ → เขียนคำถามไว้ใน PR description หัวข้อ `Open questions` แล้วทำทางเลือกที่ conservative ที่สุด
 
@@ -132,7 +133,14 @@ SPEC (from ADR-009, summary — ADR wins on conflict)
 - Login always requires OTP (2FA). Same error message for wrong email or password. Forgot password always returns the same message.
   Duplicate email on register => 409 (accepted trade-off).
 - CSRF: SameSite=Lax + Origin check on non-GET. Rate limits per ADR-013 table (login, OTP, register, forgot 3/hour).
-- requireAuth / requireRole('USER') implementation in src/http/auth-guard.ts (interface already defined by Claude).
+- Session lookup: implement createAuthenticate(deps) in src/modules/auth/authenticate.ts (already wired in server.ts).
+  requireAuth / requireRole and the Origin check (src/http/origin-guard.ts) are already mounted by Claude.
+- Inject the OTP provider via authRouter(deps, opts = {}) defaulting to a provider built from config.
+- Decisions taken (record in the PR): OTP code hash = HMAC-SHA256 keyed per challenge id; stop incrementing attempts at 5;
+  login with an unknown email still runs bcrypt.compare against a dummy hash; cookie sid Max-Age = 7 days;
+  successful reset sets emailVerifiedAt; no cleanup job for expired rows (debt).
+- Tests: write your own helper in test/auth/ that uses the real authenticate (loginAs() is a stub);
+  for 429 tests toggle config.rateLimitEnabled temporarily and restore it.
 - Never log password, OTP, cookie, token, or bodies. 4xx => info, lockout/abuse => warn.
 
 PATTERNS TO FOLLOW
@@ -142,7 +150,8 @@ PATTERNS TO FOLLOW
 - Tests: Vitest + supertest against createApp(); fake clock for TTL/idle/absolute expiry.
 
 MILESTONES (one branch + one PR each, from main)
-- B1 feature/ws-b-1-register-otp: register + OTP verify (REGISTER), OtpProvider/MockOtpProvider, bcrypt, production fail-fast.
+- B1 feature/ws-b-1-register-otp: register + OTP verify (REGISTER) + POST /auth/otp/resend (use rateLimits.otpResend()),
+  OtpProvider/MockOtpProvider, bcrypt. Production fail-fast already lives in loadConfig (ALLOW_MOCK_OTP opt-in for the demo).
 - B2 feature/ws-b-2-login-sessions: login + OTP (LOGIN) + session cookie + logout + GET /auth/me + real requireAuth + Origin check.
 - B3 feature/ws-b-3-reset-ratelimit: forgot/reset password via OTP (RESET), revoke sessions, auth rate limits.
 Required tests: OTP expired / reused / 5 wrong => locked, session idle + absolute expiry, logout deletes session,
@@ -153,13 +162,14 @@ DO NOT
   src/observability/*, other src/http/* files. Need a change there? Describe it in the PR under "Shared change request".
 - Add dependencies beyond bcryptjs (already approved). Use JWT. Change the contract silently.
 DONE = npm run typecheck && npm test && npm run build pass; PR <= ~400 non-test lines;
-PR description: what, tests, ADR-013 checklist ticked, trade-offs, open questions. Commits: feat(auth): ..., English only.
+PR description: what, tests, the "Auth & security" checklist from implementation-plan.md section 5 ticked, trade-offs,
+open questions. Commits: feat(auth): ..., English only.
 ```
 
 ## 7. ส่วนของ Claude (เพื่อให้ตรงกัน)
 
 1. **Phase 1** → PR `feature/phase-1-infra` (backend: รวม `bcryptjs` ใน package.json ให้ WS-B) + `feature/phase-1-web-shell` (frontend) → **R1** ผู้ใช้รีวิว contract + schema
-2. ระหว่างรอ R1: เขียน `AGENTS.md` (Codex) ใน backend และ `.cursor/rules/project.mdc` (Cursor) ใน backend โดยสรุป §2–4
+2. ✅ `AGENTS.md` และ `.cursor/rules/project.mdc` ใน backend · ✅ shared fixes หลังรีวิวของ Cursor: `ALLOW_MOCK_OTP`, `originGuard`, `createAuthenticate` seam, `rateLimits.otpResend`, env ใน compose
 3. หลัง R1: **WS-C** C1–C4 — ใช้ Figma MCP (`get_design_context` / `get_screenshot` ของ frame ใน page `03 Screens`, file `umgd40A9k9R8M2zhtk0Coj`) เป็น reference ทีละหน้า; mock API ด้วย MSW ตาม contract จน A1 + B2 merge
    - routes: `src/app/(auth)/*`, `src/app/(app)/*` · feature code: `src/features/<domain>/{api,hooks,components,schemas}` · ทุกหน้ามี loading/empty/error(requestId) · 401 → `/login?next=` · 409 dialog · EN/TH
 4. รีวิวเบื้องต้น PR ของ Codex/Cursor ให้ตรง contract + ADR-013 ก่อนส่งผู้ใช้
