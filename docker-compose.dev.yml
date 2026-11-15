@@ -5,6 +5,9 @@ services:
     ports: ["${DB_PORT:-5432}:5432"]
   api:
     build: { target: dev }
+    environment:
+      # Dev web runs on :3001 (prod-like on :8080); both must pass the origin guard.
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3001,http://localhost:8080}
     ports: ["3000:3000"]
     volumes: [./backend/src:/app/src]
   web:
