@@ -1,24 +1,26 @@
 # AI Collaboration Brief — แบ่งงาน Claude / Codex / Cursor
 
-สถานะ: Draft v2 (15 พ.ย. 2026 — สลับ: Claude ทำ frontend เพราะต่อ Figma MCP ได้, Cursor ทำ Auth) · อ้างอิง: [implementation-plan.md](./implementation-plan.md) §1–2 · [final-architecture.md](./final-architecture.md) · [ADR index](./adr/README.md)
+สถานะ: **v3 (16 พ.ย. 2026)** — ผู้ใช้เปลี่ยนบทบาท: **Claude = frontend · Cursor = backend · Codex = review + docs** · อ้างอิง: [implementation-plan.md](./implementation-plan.md) §1–2 · [final-architecture.md](./final-architecture.md) · [ADR index](./adr/README.md)
 
 ## 1. ใครทำอะไร
 
-| AI | งาน | Repo / branch | เหตุผล |
+| AI | บทบาท | Repo | งานที่เหลือ |
 |---|---|---|---|
-| **Claude** | **Phase 1** (infra + contract freeze) → **WS-C Frontend** (C1–C4) → **Phase 3** integration + E2E | backend + frontend (Phase 1), frontend `feature/ws-c-*`, umbrella | ต่อ Figma MCP ได้ → ดึง design context/screenshot ของแต่ละ frame มา implement ตรง ๆ; เป็นคนเขียน contract เอง |
-| **Codex** | **WS-A** Meetings & Candidates & Feedback (A1–A3 + `view=range`/`mine` ของ ADR-014) | backend `feature/ws-a-*` | proposal ของ Codex ได้คะแนน backend/data สูงสุด (comparison-matrix) |
-| **Cursor** | **WS-B** Auth (B1–B3) | backend `feature/ws-b-*` | แยก module ชัด (`src/modules/auth`), มี checklist ADR-009/013 ครบ; ผู้ใช้รีวิวละเอียดที่สุด + Claude รีวิวก่อนส่ง |
+| **Claude** | **Frontend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง frontend) | `meeting-manager-frontend` `feature/ws-c-*` | C1 (PR เปิดแล้ว) → C2 Dashboard + Meeting form → C3 Candidate Summary → C4 Calendar; ฝั่ง frontend ของ Phase 3 (ถอด mock, Playwright) |
+| **Cursor** | **Backend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง backend ด้วย) | `meeting-manager-backend` `feature/ws-b-*`, `fix/*` | B1 (PR #7) → B2 login/session/`createAuthenticate` → B3 forgot/reset; ดูแล contract, schema, `app.ts`; `make seed`; แก้ backend ตามรีวิว |
+| **Codex** | **Reviewer + docs** — ไม่เขียน feature code | ทุก repo (อ่าน) · umbrella `docs/`, `README.md` ทุก repo | รีวิวทุก PR ก่อนผู้ใช้; README / setup / decisions / limitations; อัปเดต docs ให้ตรงโค้ดจริง |
 
-**ลำดับ:** Phase 1 merge แล้ว ([backend PR #1](https://github.com/Mrdiamond096/meeting-manager-backend/pull/1)) — Codex และ Cursor **แตก branch จาก `main`** ได้เลย
-ผู้ใช้รีวิวทุก PR; AI ไม่ merge เอง
+ประวัติ: Phase 1 (Claude) และ WS-A A1–A3 (Codex) merge แล้ว — backend PR #1–#6
+
+**ลำดับงาน:** B2 ต้อง merge ก่อนที่ frontend จะต่อ backend จริงครบ (ทุก route ที่ไม่ใช่ auth ตอบ 401 จนกว่าจะมี session จริง)
+ผู้ใช้เป็นคน merge; AI ไม่ merge เอง · ทุก PR: เจ้าของเปิด → **Codex รีวิว** → ผู้ใช้อนุมัติ/merge
 
 ## 2. กติการ่วม (ทุก AI ต้องทำตาม)
 
 1. **อ่านก่อนเขียนโค้ด** (ตาม §3) และทำตาม pattern ที่มีอยู่ — ห้ามเพิ่ม framework/library ที่ไม่อยู่ใน ADR; ถ้าจำเป็นให้ถามใน PR description ก่อน
 2. **แก้เฉพาะไฟล์ที่ตัวเองเป็นเจ้าของ** (§4) — ไฟล์ร่วมต้องแก้ใน PR แยกที่ระบุชัดว่า "shared change"
 3. **Contract เป็นกฎหมาย:** `backend/docs/api-contract.md` — ถ้าเห็นว่าต้องเปลี่ยน ให้เปิด PR แก้ contract แยก ห้ามแก้แบบเงียบ ๆ ใน PR feature
-4. **Git:** branch `feature/ws-<a|b|c>-<n>-<short-kebab>` จาก `main`; Conventional Commits `feat(<scope>): <summary>` (scope: `meetings`, `candidates`, `feedback`, `auth`, `web`, `infra`); ห้าม force-push `main`; ไม่ commit `.env` หรือ secret
+4. **Git:** branch `feature/ws-<b|c>-<n>-<short-kebab>` (หรือ `fix/<desc>`, `docs/<desc>`) จาก `main`; Conventional Commits `feat(<scope>): <summary>` (scope: `meetings`, `candidates`, `feedback`, `auth`, `web`, `infra`, `docs`); ห้าม force-push `main`; ไม่ commit `.env` หรือ secret
 5. **ขนาด PR:** ≤ ~400 บรรทัดที่ไม่ใช่ test/migration; 1 milestone = 1 PR
 6. **Definition of done:** `npm run typecheck && npm test && npm run build` ผ่าน · test ครอบ acceptance ของ milestone · PR description มี: ทำอะไร, test อะไร, trade-off, สิ่งที่ยังไม่ทำ
 7. **ภาษา:** โค้ด, commit, PR เป็นภาษาอังกฤษ; ข้อความ UI มีทั้ง EN/TH ตาม Figma
@@ -49,135 +51,88 @@
 
 ## 4. Ownership
 
-| เจ้าของ | Backend | Frontend |
-|---|---|---|
-| Claude (Phase 1, ไฟล์ร่วม) | `src/app.ts`, `src/config.ts`, `src/db/client.ts`, `src/db/schema/*`, `drizzle/*`, `src/http/*`, `src/observability/*`, `test/helpers/*`, `docs/api-contract.md`, `package.json` | `middleware.ts`, `next.config.ts`, `src/app/layout.tsx`, `src/app/providers.tsx`, `src/lib/*`, `src/components/ui/*`, `package.json` |
-| Cursor (WS-B) | `src/modules/auth/*`, `src/http/auth-guard.ts` (implementation), `test/auth/*` | — |
-| Codex (WS-A) | `src/modules/meetings/*`, `src/modules/candidates/*`, `src/modules/feedback/*`, `test/meetings/*`, `test/candidates/*`, `test/feedback/*` | — |
-| Claude (WS-C) | — | `src/app/(auth)/*`, `src/app/(app)/*`, `src/features/*`, `src/mocks/*` (MSW), tests ข้างไฟล์ |
+| เจ้าของ | แก้ได้ |
+|---|---|
+| **Claude** | ทั้ง repo `meeting-manager-frontend` · umbrella `docker-compose*.yml` ส่วน `web` |
+| **Cursor** | ทั้ง repo `meeting-manager-backend` (รวม `app.ts`, `config.ts`, `db/**`, `drizzle/**`, `http/**`, `observability/**`, `test/helpers/**`, `docs/api-contract.md`, `package.json`) · umbrella `docker-compose*.yml` ส่วน `api`/`db` |
+| **Codex** | umbrella `docs/**`, `README.md` (umbrella + ทั้งสอง submodule), `AGENTS.md`/rules ร่วมกับผู้ใช้ · **ห้าม**แก้ `src/**`, `test/**`, `drizzle/**`, contract |
+| ผู้ใช้ | `Makefile`, `.github/**`, ตัดสิน contract change |
 
-ต้องการ dependency ใหม่หรือแก้ schema/ไฟล์ร่วม → ขอใน PR description; Claude/ผู้ใช้เป็นคนแก้ไฟล์ร่วม
+- **Contract change** (`backend/docs/api-contract.md`): Cursor เปิด PR `contract: ...` แยก → Codex รีวิว → ผู้ใช้อนุมัติ → แจ้ง Claude ด้วยลิงก์ PR
+- Claude ต้องการ endpoint/field ใหม่ → เขียน "Contract change request" ใน PR ของ frontend หรือแจ้งผู้ใช้ ไม่แก้ backend เอง
+- Codex เจอบั๊กระหว่างรีวิว → comment ใน PR (ผ่านผู้ใช้) ไม่ push แก้เอง
 
-## 5. Prompt สำหรับ Codex (WS-A)
-
-```text
-You are working on the backend of "Candidate Meeting Scheduler"
-(repo: meeting-manager-backend, Node 24 + Express 5 + TypeScript + Drizzle + PostgreSQL 16 + Zod + Vitest/supertest).
-You own workstream WS-A: Meetings, Candidates, Feedback. Two other AIs work in parallel:
-Claude owns shared infra + the Next.js frontend (WS-C), Cursor owns Auth (WS-B).
-
-READ FIRST (in the umbrella repo meeting-manager, docs live outside the submodule):
-1. docs/requirement/20251009_Software Engineer_WebApp_Interview.md
-2. docs/discussion/finally/final-architecture.md (sections 4 Data Model, 5 API, 16 Acceptance)
-3. docs/discussion/finally/implementation-plan.md (sections 1 and 2, WS-A rows)
-4. docs/discussion/finally/ai-collaboration.md (this brief: rules, ownership)
-5. ADRs: 003 data access, 005 datetime, 006 candidate identity, 007 concurrency, 012 logging, 014 calendar
-6. backend/docs/api-contract.md  <- source of truth, do not deviate
-Then read existing code to copy its patterns: src/app.ts, src/routes/health.ts, src/http/*,
-src/observability/*, src/db/schema/*, test/health.test.ts, test/helpers/*.
-
-PATTERNS TO FOLLOW
-- Module layout: src/modules/<domain>/{router.ts, service.ts, repository.ts, schemas.ts}
-  router = HTTP + Zod validation via src/http/validate.ts; service = rules/transitions; repository = Drizzle only.
-- Routers are factory functions taking deps; mount them only via the hook Claude left in app.ts.
-- Errors: throw AppError with codes from src/http/errors.ts; never res.status(...) ad hoc for errors.
-- Logging: use req.log / the shared logger; never console.log; never log bodies.
-- ESM imports with .js suffix. Strict Zod (reject unknown keys).
-- Tests: Vitest + supertest against createApp(); use test/helpers (DB reset, loginAs()).
-
-MILESTONES (one branch + one PR each, from main)
-- A1 feature/ws-a-1-meetings-crud: list (page, pageSize<=50, status, from, to, candidateId, mine), get, create,
-  PATCH with version (409 on mismatch), DELETE ?version, POST /cancel, status transitions, created_by.
-  Also GET /meetings?view=range&from&to&status&mine (range <= 42 days, <= 500 items, else 400) per ADR-014.
-- A2 feature/ws-a-2-candidates: search ?q (limit 10), create, detail with upcoming + history;
-  create candidate + meeting in one transaction.
-- A3 feature/ws-a-3-feedback: append-only feedback; cascade on meeting delete.
-Required tests: 400 validation, 404, 409 version, pagination edges (page beyond end => 200 + []),
-transitions, transaction rollback, 401 when not logged in (via auth guard), range limits.
-
-DO NOT
-- Touch src/modules/auth/*, src/app.ts, src/db/schema/*, drizzle/*, package.json, src/http/*, src/observability/*.
-  If you need a schema/shared change, stop and describe it in the PR under "Shared change request".
-- Add dependencies. Change the API contract silently.
-DONE = npm run typecheck && npm test && npm run build pass; PR <= ~400 non-test lines;
-PR description: what, tests, trade-offs, open questions. Commits: feat(meetings): ..., English only.
-```
-
-## 6. Prompt สำหรับ Cursor (WS-B Auth)
+## 5. Prompt สำหรับ Codex (Review + Docs)
 
 ```text
-You are working on the backend of "Candidate Meeting Scheduler"
-(repo: meeting-manager-backend, Node 24 + Express 5 + TypeScript + Drizzle + PostgreSQL 16 + Zod + Vitest/supertest).
-You own workstream WS-B: Authentication. Two other AIs work in parallel:
-Claude owns shared infra + the Next.js frontend (WS-C), Codex owns Meetings/Candidates/Feedback (WS-A).
-This is the most security-sensitive part; it will be reviewed line by line against ADR-009 and ADR-013.
+You are the reviewer and documentation owner for "Candidate Meeting Scheduler"
+(umbrella repo meeting-manager with submodules meeting-manager-backend and meeting-manager-frontend).
+Claude writes the frontend (Next.js 15), Cursor writes the backend (Express 5 + Drizzle + PostgreSQL).
+You do NOT write feature code. You review every PR before the user merges it, and you own the docs.
 
-READ FIRST (umbrella repo meeting-manager):
+READ FIRST (umbrella repo):
 1. docs/requirement/20251009_Software Engineer_WebApp_Interview.md
-2. docs/discussion/finally/final-architecture.md (sections 4 Data Model, 5 API, 8 Security, 16 Acceptance)
-3. docs/discussion/finally/implementation-plan.md (sections 1, 2 WS-B rows, 5 release checklist "Auth & security")
-4. docs/discussion/finally/ai-collaboration.md (rules, ownership)
-5. docs/discussion/finally/api-security-observability-proposal.md (sections on auth, rate limits, logging)
-6. ADRs: 009 auth (main spec), 011 API communication, 012 logging, 013 security baseline + rate-limit table
-7. backend/docs/api-contract.md  <- auth endpoints, cookie, error codes; do not deviate
-Then read existing code: src/app.ts, src/config.ts, src/http/* (errors, validate, rate-limit, auth-guard interface),
-src/observability/*, src/db/schema/{users,sessions,otp_challenges}.ts, test/helpers/*, test/health.test.ts.
+2. docs/discussion/finally/final-architecture.md, implementation-plan.md (section 5 = release checklist)
+3. docs/discussion/finally/ai-collaboration.md (roles, rules, ownership)
+4. docs/discussion/finally/adr/* (all; 009 auth, 011 API, 012 logging, 013 security, 014 calendar matter most)
+5. backend/docs/api-contract.md (source of truth), backend/AGENTS.md
+6. docs/design/DESIGN_GUIDELINES.md and docs/design/screens/*.png (frontend reviews)
 
-SPEC (from ADR-009, summary — ADR wins on conflict)
-- Email identifier: lowercase + trim, unique. Password 8..72 bytes, bcryptjs cost 12.
-- OTP via interface OtpProvider; MockOtpProvider uses OTP_MOCK_CODE (112233 in .env.example).
-  Refuse to start when NODE_ENV=production and the mock provider is configured.
-- otp_challenges: purpose REGISTER/LOGIN/RESET, store code hash, 5 min TTL, single use, locked after 5 wrong attempts (log warn).
-- Sessions in Postgres + cookie `sid` (httpOnly, SameSite=Lax, Path=/, Secure via env); idle 8h, absolute 7d;
-  store only a hash of the session token; logout deletes the row; password reset deletes all user sessions.
-- Login always requires OTP (2FA). Same error message for wrong email or password. Forgot password always returns the same message.
-  Duplicate email on register => 409 (accepted trade-off).
-- CSRF: SameSite=Lax + Origin check on non-GET. Rate limits per ADR-013 table (login, OTP, register, forgot 3/hour).
-- Session lookup: implement createAuthenticate(deps) in src/modules/auth/authenticate.ts (already wired in server.ts).
-  requireAuth / requireRole and the Origin check (src/http/origin-guard.ts) are already mounted by Claude.
-- Inject the OTP provider via authRouter(deps, opts = {}) defaulting to a provider built from config.
-- Decisions taken (record in the PR): OTP code hash = HMAC-SHA256 keyed per challenge id; stop incrementing attempts at 5;
-  login with an unknown email still runs bcrypt.compare against a dummy hash; cookie sid Max-Age = 7 days;
-  successful reset sets emailVerifiedAt; no cleanup job for expired rows (debt).
-- Tests: write your own helper in test/auth/ that uses the real authenticate (loginAs() is a stub);
-  for 429 tests toggle config.rateLimitEnabled temporarily and restore it.
-- Never log password, OTP, cookie, token, or bodies. 4xx => info, lockout/abuse => warn.
+REVIEW (for each PR the user gives you)
+- Check out the PR branch; run `npm ci && npm run typecheck && npm test && npm run build`
+  (backend tests need a separate Postgres; never point them at the `make up`/`make dev` database: tests truncate all tables).
+- Check, in this order: correctness vs api-contract.md and ADRs; security (ADR-013 + "Auth & security" checklist:
+  enumeration, OTP limits, session expiry, cookie flags, origin guard, no secrets/emails in logs, no dangerouslySetInnerHTML,
+  nonce CSP not weakened); missing/weak tests for the milestone's acceptance; ownership (files outside the author's area);
+  readability and hand-over (repo patterns, no dead code, no unrelated refactors, PR size <= ~400 non-test lines).
+- Verify claims by running code or tests; do not report guesses as findings.
+- Output: a short verdict (approve / request changes) + numbered findings, each with file:line, severity
+  (blocker / should-fix / nit), the concrete failure scenario, and a suggested fix. Write it so the user can paste it as a PR comment.
+- Never push to someone else's branch and never merge.
 
-PATTERNS TO FOLLOW
-- Module layout: src/modules/auth/{router.ts, service.ts, repository.ts, schemas.ts, otp-provider.ts, password.ts, session.ts}.
-- Router factory with injected deps (clock, OtpProvider) so tests control time; mount only via the hook in app.ts.
-- Throw AppError with codes from src/http/errors.ts; validate with src/http/validate.ts; ESM imports with .js suffix.
-- Tests: Vitest + supertest against createApp(); fake clock for TTL/idle/absolute expiry.
-
-MILESTONES (one branch + one PR each, from main)
-- B1 feature/ws-b-1-register-otp: register + OTP verify (REGISTER) + POST /auth/otp/resend (use rateLimits.otpResend()),
-  OtpProvider/MockOtpProvider, bcrypt. Production fail-fast already lives in loadConfig (ALLOW_MOCK_OTP opt-in for the demo).
-- B2 feature/ws-b-2-login-sessions: login + OTP (LOGIN) + session cookie + logout + GET /auth/me + real requireAuth + Origin check.
-- B3 feature/ws-b-3-reset-ratelimit: forgot/reset password via OTP (RESET), revoke sessions, auth rate limits.
-Required tests: OTP expired / reused / 5 wrong => locked, session idle + absolute expiry, logout deletes session,
-enumeration-safe responses, 429, production + mock => startup error, no secrets in logs (assert on captured log output), Origin rejected.
-
-DO NOT
-- Touch src/modules/meetings|candidates|feedback, src/app.ts, src/db/schema/*, drizzle/*, package.json,
-  src/observability/*, other src/http/* files. Need a change there? Describe it in the PR under "Shared change request".
-- Add dependencies beyond bcryptjs (already approved). Use JWT. Change the contract silently.
-DONE = npm run typecheck && npm test && npm run build pass; PR <= ~400 non-test lines;
-PR description: what, tests, the "Auth & security" checklist from implementation-plan.md section 5 ticked, trade-offs,
-open questions. Commits: feat(auth): ..., English only.
+DOCS (own branch docs/<desc> in the umbrella or a submodule, one PR each)
+- Keep README accurate: setup (make init/up/dev, DB_PORT, Node 24), env vars, demo account + mock OTP 112233,
+  API summary (link the contract), architecture + decisions (link ADRs), security and operations, limitations, future work (guest role).
+- Update docs when merged code changes behaviour; flag drift between code, contract and ADRs as review findings.
+- English for README/code docs; Thai is fine in docs/discussion.
 ```
 
-## 7. ส่วนของ Claude (เพื่อให้ตรงกัน)
+## 6. Prompt สำหรับ Cursor (Backend owner)
 
-1. **Phase 1** → PR `feature/phase-1-infra` (backend: รวม `bcryptjs` ใน package.json ให้ WS-B) + `feature/phase-1-web-shell` (frontend) → **R1** ผู้ใช้รีวิว contract + schema
-2. ✅ `AGENTS.md` และ `.cursor/rules/project.mdc` ใน backend · ✅ shared fixes หลังรีวิวของ Cursor: `ALLOW_MOCK_OTP`, `originGuard`, `createAuthenticate` seam, `rateLimits.otpResend`, env ใน compose
-3. หลัง R1: **WS-C** C1–C4 — ใช้ Figma MCP (`get_design_context` / `get_screenshot` ของ frame ใน page `03 Screens`, file `umgd40A9k9R8M2zhtk0Coj`) เป็น reference ทีละหน้า; mock API ด้วย MSW ตาม contract จน A1 + B2 merge
-   - routes: `src/app/(auth)/*`, `src/app/(app)/*` · feature code: `src/features/<domain>/{api,hooks,components,schemas}` · ทุกหน้ามี loading/empty/error(requestId) · 401 → `/login?next=` · 409 dialog · EN/TH
-4. รีวิวเบื้องต้น PR ของ Codex/Cursor ให้ตรง contract + ADR-013 ก่อนส่งผู้ใช้
-5. Phase 3: ถอด MSW, Playwright smoke, seed, README
+```text
+You now own the whole backend of "Candidate Meeting Scheduler" (repo meeting-manager-backend), including the shared files
+previously owned by Claude: src/app.ts, src/config.ts, src/db/**, drizzle/**, src/http/**, src/observability/**,
+test/helpers/**, docs/api-contract.md, package.json. Claude owns the frontend; Codex reviews every PR and owns docs.
+
+Rules that still apply: backend/AGENTS.md patterns; the contract is the source of truth;
+contract changes go in a separate PR titled "contract: ..." and must be announced (the frontend depends on it).
+Schema changes: edit src/db/schema/*, run `npm run db:generate`, never edit merged migrations.
+
+Your queue:
+1. B1 (PR #7): finish per Codex/user review.
+2. B2 feature/ws-b-2-login-sessions: login + OTP (LOGIN), session cookie, logout, GET /auth/me,
+   implement createAuthenticate (src/modules/auth/authenticate.ts). After merge every /api/v1 route works with a real session.
+   Add a test helper that logs in through the real flow alongside the existing loginAs() stub.
+3. B3 feature/ws-b-3-reset-ratelimit: forgot/reset password, revoke sessions, auth rate limits.
+4. `make seed`: demo user (verified, password documented in README by Codex) + candidates + meetings around today.
+5. Follow-ups: log a fatal JSON line when config validation fails at startup (ADR-012).
+DONE = typecheck + tests + build green; Conventional Commits in English; PR description with tests, trade-offs, open questions,
+and the "Auth & security" checklist (implementation-plan.md section 5) for auth PRs.
+```
+
+## 7. ส่วนของ Claude (frontend)
+
+1. ✅ Phase 1 (backend + web shell) · ✅ shared fixes หลังรีวิวของ Cursor · ✅ dev compose origin `:3001`
+2. **C1** auth pages — frontend PR #2 (รอรีวิว; ทดสอบ end-to-end หลัง B1/B2)
+3. **C2** Dashboard (list, filter, Mine/All, pagination, states) + Meeting form (candidate combobox, Onsite/Online, 409)
+4. **C3** Candidate Summary (info, notes/feedback, history, Edit/Cancel/Delete)
+5. **C4** Calendar (Week/Month, mobile Day agenda, popover, click-to-create)
+6. Phase 3 ฝั่ง frontend: ต่อ API จริงครบ, Playwright smoke (`make up`), ตรวจ CSP
+- ใช้ Figma MCP (`get_screenshot` / `get_design_context` page `03 Screens`, file `umgd40A9k9R8M2zhtk0Coj`) เป็น reference ทีละหน้า
 
 ## 8. การส่งต่องาน / สื่อสาร
 
-- ทุก AI ไม่เห็นแชทของกันและกัน → ข้อมูลที่ต้องรู้ร่วมกันต้องอยู่ใน **repo** (contract, ADR, PR description) เท่านั้น
-- เปลี่ยน contract → PR แยก + ผู้ใช้แจ้ง AI อีกสองตัวโดยวางลิงก์ PR ในแชท
-- ผู้ใช้เป็นคน merge; ลำดับ: Phase 1 → B2 (Cursor) ก่อนเปิด `requireAuth` จริงบน route ของ A (Codex) → frontend (Claude) ต่อ backend จริงหลัง A1 + B2
-- Codex และ Cursor ทำงานใน repo backend เดียวกันคนละ module → ทั้งคู่ต้อง rebase บน `main` ก่อนเปิด PR; ถ้าชนกันในไฟล์ร่วม ให้หยุดและแจ้งผู้ใช้
+- ทุก AI ไม่เห็นแชทของกันและกัน → ข้อมูลที่ต้องรู้ร่วมกันต้องอยู่ใน **repo** (contract, ADR, PR description, review comment) เท่านั้น
+- Flow ของทุก PR: เจ้าของเปิด PR → ผู้ใช้ส่งลิงก์ให้ Codex รีวิว → เจ้าของแก้ → ผู้ใช้ merge
+- Contract เปลี่ยน → PR แยกของ Cursor → ผู้ใช้วางลิงก์ให้ Claude
+- โฟลเดอร์ `backend/` ในเครื่องถูก Cursor checkout branch ทำงานอยู่ — Claude/Codex ใช้ `git worktree` แยกเมื่อต้องรันหรือแก้ backend เพื่อไม่ทับงาน; `make dev` จะรันโค้ดตาม branch ที่ checkout อยู่ในโฟลเดอร์นั้น
