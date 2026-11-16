@@ -36,7 +36,7 @@ flowchart LR
 ```
 
 ### Phase 0 — Day 1 foundation ✅ (ทำแล้ว ยังไม่ commit)
-Node 24, Next.js 15 scaffold + Tailwind tokens, Drizzle + migration `meetings`, health endpoints, compose healthchecks, CI workflows 3 repo
+Node 24, Next.js 15 scaffold + Tailwind tokens, Prisma (เดิม Drizzle) + migration `meetings`, health endpoints, compose healthchecks, CI workflows 3 repo
 
 **Review gate R0:** ผู้ใช้รีวิว diff Day 1 → commit + push `feature/day1-foundation` → merge `main` → bump submodule pointer ใน umbrella
 
@@ -49,7 +49,7 @@ Node 24, Next.js 15 scaffold + Tailwind tokens, Drizzle + migration `meetings`, 
 | Zod helpers สำหรับ body/query/params (strict) | backend | `src/http/validate.ts` |
 | `trust proxy`, DB `statement_timeout`, env validation ด้วย Zod (fail-fast mock OTP ใน production) | backend | `src/config.ts`, `src/db/client.ts` |
 | Rate limiter factory (`RATE_LIMIT_ENABLED`) | backend | `src/http/rate-limit.ts` |
-| Schema แยกไฟล์ต่อ domain + migration: `users`, `sessions`, `otp_challenges`, `candidates`, `feedback`, ฟิลด์ใหม่ของ `meetings` (`candidate_id`, `end_at`, `meeting_type`, `provider`, `created_by`) | backend | `src/db/schema/*.ts`, `drizzle/0001_*.sql` |
+| Schema แยกไฟล์ต่อ domain + migration: `users`, `sessions`, `otp_challenges`, `candidates`, `feedback`, ฟิลด์ใหม่ของ `meetings` (`candidate_id`, `end_at`, `meeting_type`, `provider`, `created_by`) | backend | `prisma/schema.prisma`, `prisma/migrations/*` (เดิม `src/db/schema/*.ts`, `drizzle/0001_*.sql`) |
 | Route mounting ใน `app.ts` (`/api/v1/auth`, `/meetings`, `/candidates` เป็น router ว่าง) + interface `requireAuth` | backend | `src/app.ts`, `src/http/auth-guard.ts` (interface) |
 | Test helpers: reset DB ต่อ test, `loginAs()` | backend | `test/helpers/*` |
 | **API contract** ทุก endpoint (auth + meetings + candidates + feedback) | backend | `docs/api-contract.md` |

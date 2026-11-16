@@ -4,7 +4,7 @@
 
 ## Decision
 **API (Express)**
-- Zod `.strict()` ทุก body/query/params; UUID ใน path ตรวจก่อนถึง DB; Drizzle parameterized (ห้าม `sql.raw` กับ input)
+- Zod `.strict()` ทุก body/query/params; UUID ใน path ตรวจก่อนถึง DB; Prisma parameterized (raw SQL ผ่าน tagged `$queryRaw` เท่านั้น; ห้าม `$queryRawUnsafe` กับ input)
 - Error middleware เดียว: shape `{ error: { code, message, details?, requestId } }`; 500 ไม่มี stack/SQL
 - `helmet()`, ปิด `x-powered-by`, `express.json({ limit: '100kb' })`, pg `statement_timeout` 5s
 - ไม่ติดตั้ง CORS (same-origin, ADR-011)

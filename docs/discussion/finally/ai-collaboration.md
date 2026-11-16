@@ -44,7 +44,7 @@
 | App composition | `backend/src/app.ts` | `createApp(deps)` รับ dependency ผ่าน argument (ทดสอบได้โดยไม่ต้องมี DB จริง) |
 | Router | `backend/src/routes/health.ts` | factory function คืน `Router`; ไม่มี global state |
 | Test | `backend/test/health.test.ts` | Vitest + supertest เรียก `createApp(...)` ตรง ๆ |
-| DB | `backend/src/db/schema.ts`, `client.ts`, `drizzle/` | Drizzle schema → `npm run db:generate` สร้าง migration; ห้ามแก้ migration ที่ merge แล้ว |
+| DB | `backend/prisma/schema.prisma`, `prisma/migrations/`, `src/db/client.ts` | Prisma schema → `npm run db:migrate` สร้าง migration (ตรวจ SQL ก่อน commit); CHECK constraint/expression index เขียนเองใน migration; ห้ามแก้ migration ที่ merge แล้ว |
 | Import | ทั้ง backend | ESM, import ลงท้าย `.js` |
 | Frontend | `frontend/src/app/*`, `frontend/next.config.ts` | App Router, server components เป็นค่าเริ่มต้น, `'use client'` เฉพาะที่จำเป็น; เรียก API ผ่าน `/api/v1/*` (same-origin rewrite, ADR-011) |
 | Design | `docs/design/DESIGN_GUIDELINES.md`, `docs/design/tokens/globals.css`, `docs/design/screens/*.png`, Figma `umgd40A9k9R8M2zhtk0Coj` | ใช้ token เท่านั้น ห้าม hex ตรง; ชื่อ component ตาม shadcn/ui |
@@ -54,8 +54,8 @@
 | เจ้าของ | แก้ได้ |
 |---|---|
 | **Claude** | ทั้ง repo `meeting-manager-frontend` · umbrella `docker-compose*.yml` ส่วน `web` |
-| **Cursor** | ทั้ง repo `meeting-manager-backend` (รวม `app.ts`, `config.ts`, `db/**`, `drizzle/**`, `http/**`, `observability/**`, `test/helpers/**`, `docs/api-contract.md`, `package.json`) · umbrella `docker-compose*.yml` ส่วน `api`/`db` |
-| **Codex** | umbrella `docs/**`, `README.md` (umbrella + ทั้งสอง submodule), `AGENTS.md`/rules ร่วมกับผู้ใช้ · **ห้าม**แก้ `src/**`, `test/**`, `drizzle/**`, contract |
+| **Cursor** | ทั้ง repo `meeting-manager-backend` (รวม `app.ts`, `config.ts`, `db/**`, `prisma/**`, `http/**`, `observability/**`, `test/helpers/**`, `docs/api-contract.md`, `package.json`) · umbrella `docker-compose*.yml` ส่วน `api`/`db` |
+| **Codex** | umbrella `docs/**`, `README.md` (umbrella + ทั้งสอง submodule), `AGENTS.md`/rules ร่วมกับผู้ใช้ · **ห้าม**แก้ `src/**`, `test/**`, `prisma/**`, contract |
 | ผู้ใช้ | `Makefile`, `.github/**`, ตัดสิน contract change |
 
 - **Contract change** (`backend/docs/api-contract.md`): Cursor เปิด PR `contract: ...` แยก → Codex รีวิว → ผู้ใช้อนุมัติ → แจ้ง Claude ด้วยลิงก์ PR
@@ -67,7 +67,7 @@
 ```text
 You are the reviewer and documentation owner for "Candidate Meeting Scheduler"
 (umbrella repo meeting-manager with submodules meeting-manager-backend and meeting-manager-frontend).
-Claude writes the frontend (Next.js 15), Cursor writes the backend (Express 5 + Drizzle + PostgreSQL).
+Claude writes the frontend (Next.js 15), Cursor writes the backend (Express 5 + Prisma + PostgreSQL).
 You do NOT write feature code. You review every PR before the user merges it, and you own the docs.
 
 READ FIRST (umbrella repo):
@@ -101,7 +101,7 @@ DOCS (own branch docs/<desc> in the umbrella or a submodule, one PR each)
 
 ```text
 You now own the whole backend of "Candidate Meeting Scheduler" (repo meeting-manager-backend), including the shared files
-previously owned by Claude: src/app.ts, src/config.ts, src/db/**, drizzle/**, src/http/**, src/observability/**,
+previously owned by Claude: src/app.ts, src/config.ts, src/db/**, prisma/**, src/http/**, src/observability/**,
 test/helpers/**, docs/api-contract.md, package.json. Claude owns the frontend; Codex reviews every PR and owns docs.
 
 Rules that still apply: backend/AGENTS.md patterns; the contract is the source of truth;

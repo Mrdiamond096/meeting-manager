@@ -36,12 +36,12 @@ Modular monolith สามชิ้นที่ deploy เป็น container �
 flowchart LR
   Browser -->|HTTPS| Proxy["web: Next.js standalone<br/>pages + rewrite /api"]
   Proxy -->|/api/*| API["api: Express 5 (TS)<br/>routes → service → repository"]
-  API -->|Drizzle / pg| DB[("db: PostgreSQL 16<br/>named volume")]
+  API -->|Prisma / pg| DB[("db: PostgreSQL 16<br/>named volume")]
 ```
 
 - **Same-origin** ผ่าน nginx → ไม่ต้อง CORS/cross-site cookie [A][B]
 - nginx upstream กำหนดผ่าน env (`API_UPSTREAM`, default `api:3000`) เพื่อใช้ได้ทั้ง Compose และ host อื่น [New — แก้ข้อวิจารณ์ CL-03]
-- Backend layering: `routes` (HTTP + Zod parse) → `services` (rules, transitions, version check) → `repositories` (Drizzle) [A][B]
+- Backend layering: `routes` (HTTP + Zod parse) → `services` (rules, transitions, version check) → `repositories` (Prisma) [A][B]
 - Error format: `{ error: { code, message, details? } }` — ไม่อ้างว่าเป็น RFC 9457 [B]
 - Health: `GET /api/health/live`, `GET /api/health/ready` (ping DB) [B]
 
@@ -143,7 +143,7 @@ Validation: Zod strict (reject unknown keys, `id`, timestamps); PATCH ว่า�
 
 ## 8. Security (ขนาดพอดีโจทย์)
 
-helmet, `express.json({ limit: '100kb' })`, Zod strict, parameterized query (Drizzle), React escape (ไม่ render HTML), rate limit แบบง่ายบน write, ไม่ log body, `.env.example` เท่านั้นใน git, container รันเป็น non-root, DB port ไม่ publish ใน production compose
+helmet, `express.json({ limit: '100kb' })`, Zod strict, parameterized query (Prisma), React escape (ไม่ render HTML), rate limit แบบง่ายบน write, ไม่ log body, `.env.example` เท่านั้นใน git, container รันเป็น non-root, DB port ไม่ publish ใน production compose
 ไม่มี auth ใน baseline → README ระบุชัดว่าเป็น **public demo ห้ามใส่ข้อมูลจริง** [B]
 
 ---
@@ -179,7 +179,7 @@ helmet, `express.json({ limit: '100kb' })`, Zod strict, parameterized query (Dri
 |---|---|---|---|
 | D1 | Scope: core CRUD gate → thin candidate journey; ไม่มี rating/COMPLETED/users | A + B | [ADR-001](./adr/ADR-001-scope.md) |
 | D2 | Stack: React/TS/Vite + Express 5/TS + PG16, Node 24 LTS | A, B, R | [ADR-002](./adr/ADR-002-stack-runtime.md) |
-| D3 | Drizzle ORM + drizzle-kit SQL migrations committed | A | [ADR-003](./adr/ADR-003-data-access.md) |
+| D3 | Prisma ORM + `prisma migrate` SQL migrations committed (เปลี่ยนจาก Drizzle: ผู้พัฒนาคุ้นเคย, คาดว่าทีมใช้) | A → revised | [ADR-003](./adr/ADR-003-data-access.md) |
 | D4 | Contract: backend Zod authority, frontend types แยก | New | [ADR-004](./adr/ADR-004-contract-sharing.md) |
 | D5 | `dueDate` = start instant + optional `endAt`; RFC 3339 offset in, UTC out | B | [ADR-005](./adr/ADR-005-datetime.md) |
 | D6 | Candidate identity ด้วย ID, explicit create | B | [ADR-006](./adr/ADR-006-candidate-identity.md) |
