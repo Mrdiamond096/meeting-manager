@@ -1,5 +1,7 @@
 # 13. Security Considerations
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 | Area | Plan |
 |---|---|
 | Input validation | Zod on every body/query/param; length caps; enum checks; strip unknown keys |

@@ -1,5 +1,7 @@
 # 22. Architecture Decision Records (Proposed)
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 | ADR | Decision | Status | Context → Consequence |
 |---|---|---|---|
 | 001 | Single `meetings` resource as superset of core + wireframe fields; `dueDate` ≙ `startAt` | Proposed | Resolves spec conflict; one source of truth for time |

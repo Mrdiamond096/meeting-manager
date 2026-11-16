@@ -39,7 +39,7 @@
 | S10 | Global | — | toast (success/error), 404 page, generic error page |
 
 **Breakpoints:** Desktop 1440 (หลัก) + Mobile 390 สำหรับ S1, S2, S6, S7, S8 (หน้าที่มี layout ต่างกันจริง) — หน้าอื่น desktop อย่างเดียว
-**Theme:** Light เป็นหลัก; Dark mode แค่ variable modes (ไม่วาด frame แยก) — ตรวจด้วยการสลับ mode
+**Theme:** Light เป็นหลัก; Dark ใช้ variable mode `Dark` ของ collection `Color` และมี frame แยกใน page `04 Screens — Dark` (เพิ่ม 16 พ.ย. 2026)
 
 ## 4. โครงไฟล์ Figma
 
@@ -166,6 +166,7 @@ flowchart LR
 | F4+ S11 Calendar (ADR-014) | ✅ อนุมัติแล้ว · section `Calendar — S11`: Week (time grid 07–20, now line, overlap, ช่องว่าง "+ New meeting"), Week + event popover, Month (+n more), mobile Day agenda (week strip + agenda), Week TH (พ.ศ.) · components ใหม่ `Calendar Event` (4 status) และ `Segmented Control` · S6 ทุก state เพิ่ม toggle List\|Calendar และ Mine\|All |
 | F5 User flows | ✅ page `02 Flows & Prototype` frame `F5 User flows` (lanes A–H + legend) |
 | F6 Prototype | ✅ page `03 Screens` flow starting points: **P1** Login → OTP → Dashboard · **P2** Dashboard → Schedule → Summary → Edit/Cancel · **P3** Calendar (List↔Calendar, Week↔Month, event → popover → Summary, empty slot → Schedule) |
+| F8 Dark theme | ✅ (16 พ.ย. 2026) เพิ่ม mode `Dark` ใน collection `Color` (ค่าตาม `.dark` ใน globals.css) · page `04 Screens — Dark` สำเนาครบ 7 sections / 31 frames · ผูกสี hardcode 160 จุดเข้ากับ variable · overlay dialog เป็นดำ 60% · PNG ที่ `docs/design/screens/dark/` |
 | F7 Export | ✅ `docs/design/screens/*.png` (9 ไฟล์) + ลิงก์ใน `docs/design/README.md` · **ค้าง:** ตั้ง share link (Anyone with link can view) ต้องทำเองใน Figma |
 
 **หมายเหตุ F4:** ย้าย component `App Header · Mobile` ไป `01 Design System` แล้ว · M · S6 (mobile) ยังไม่มี toggle List|Calendar · หลังอัปเกรด Pro แล้ว ข้อจำกัด 1 mode / 3 pages ใน §10 ไม่มีผลอีก — เพิ่ม Dark mode และ Language mode ได้ถ้าต้องการ

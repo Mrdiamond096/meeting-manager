@@ -1,5 +1,7 @@
 # 12. Backend Design
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 ```
 apps/api/src
 ├─ app.ts                # express app factory (testable, no listen)

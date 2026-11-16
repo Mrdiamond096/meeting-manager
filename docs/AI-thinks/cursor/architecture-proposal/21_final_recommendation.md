@@ -1,5 +1,7 @@
 # 21. Final Recommendation
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 Adopt **Approach B**:
 **React + TS + Vite + Tailwind + TanStack Query + RHF/Zod** ⟷ **Express + TS + Zod + Drizzle + PostgreSQL**, shared schema package, nginx same-origin proxy, Docker Compose, Render deploy, GitHub Actions CI, ~60–70 focused tests, thin cookie auth as the last optional item.
 

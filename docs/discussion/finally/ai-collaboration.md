@@ -106,7 +106,7 @@ test/helpers/**, docs/api-contract.md, package.json. Claude owns the frontend; C
 
 Rules that still apply: backend/AGENTS.md patterns; the contract is the source of truth;
 contract changes go in a separate PR titled "contract: ..." and must be announced (the frontend depends on it).
-Schema changes: edit src/db/schema/*, run `npm run db:generate`, never edit merged migrations.
+Schema changes: edit prisma/schema.prisma, run `npm run db:migrate` (review the generated SQL before committing), never edit merged migrations.
 
 Your queue:
 1. B1 (PR #7): finish per Codex/user review.
