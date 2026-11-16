@@ -1,18 +1,18 @@
 # AI Collaboration Brief — แบ่งงาน Claude / Codex / Cursor
 
-สถานะ: **v3 (16 พ.ย. 2026)** — ผู้ใช้เปลี่ยนบทบาท: **Claude = frontend · Cursor = backend · Codex = review + docs** · อ้างอิง: [implementation-plan.md](./implementation-plan.md) §1–2 · [final-architecture.md](./final-architecture.md) · [ADR index](./adr/README.md)
+สถานะ: **v4 (16 พ.ย. 2026)** — **Claude = frontend + E2E · Cursor = backend + README ของ backend · Codex = review + docs ส่วนกลาง**; v4: Phase 3 คนเขียนโค้ดเขียน README ของ repo ตัวเอง · อ้างอิง: [implementation-plan.md](./implementation-plan.md) §1–2 · [final-architecture.md](./final-architecture.md) · [ADR index](./adr/README.md)
 
 ## 1. ใครทำอะไร
 
 | AI | บทบาท | Repo | งานที่เหลือ |
 |---|---|---|---|
-| **Claude** | **Frontend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง frontend) | `meeting-manager-frontend` `feature/ws-c-*` | C1 (PR เปิดแล้ว) → C2 Dashboard + Meeting form → C3 Candidate Summary → C4 Calendar; ฝั่ง frontend ของ Phase 3 (ถอด mock, Playwright) |
-| **Cursor** | **Backend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง backend ด้วย) | `meeting-manager-backend` `feature/ws-b-*`, `fix/*` | B1 (PR #7) → B2 login/session/`createAuthenticate` → B3 forgot/reset; ดูแล contract, schema, `app.ts`; `make seed`; แก้ backend ตามรีวิว |
-| **Codex** | **Reviewer + docs** — ไม่เขียน feature code | ทุก repo (อ่าน) · umbrella `docs/`, `README.md` ทุก repo | รีวิวทุก PR ก่อนผู้ใช้; README / setup / decisions / limitations; อัปเดต docs ให้ตรงโค้ดจริง |
+| **Claude** | **Frontend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง frontend) | `meeting-manager-frontend` `feature/ws-c-*` ✅ C1, C2 → C3 Candidate Summary → C4 Calendar; Phase 3: CI ของ frontend (audit + Dependabot), README ของ frontend, Playwright smoke + compose smoke ใน umbrella |
+| **Cursor** | **Backend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง backend ด้วย) | `meeting-manager-backend` `feature/ws-b-*`, `fix/*` ✅ B1–B3, seed, fatal config log → Phase 3: P3-1 `make seed` (guard + Makefile), P3-2 CI ของ backend (audit + Dependabot), P3-3 README ของ backend; ดูแล contract, schema, `app.ts`; แก้ backend ตามรีวิว |
+| **Codex** | **Reviewer + docs** — ไม่เขียน feature code | ทุก repo (อ่าน) · umbrella `docs/`, umbrella `README.md` | รีวิวทุก PR ก่อนผู้ใช้ (README ทุกฉบับ: ตรวจทุก command/env/default เทียบกับโค้ด); umbrella README + docs ส่วนกลาง; อัปเดต docs ให้ตรงโค้ดจริง |
 
-ประวัติ: Phase 1 (Claude) และ WS-A A1–A3 (Codex) merge แล้ว — backend PR #1–#6
+ประวัติ: Phase 1 (Claude) และ WS-A A1–A3 (Codex) merge แล้ว — backend PR #1–#6 · Prisma #9 · B1–B3 #10–#12 · PATCH inline candidate #13 · seed #14 · fatal config log #15 · frontend C1 #2, C2 #4–#6
 
-**ลำดับงาน:** B2 ต้อง merge ก่อนที่ frontend จะต่อ backend จริงครบ (ทุก route ที่ไม่ใช่ auth ตอบ 401 จนกว่าจะมี session จริง)
+**ลำดับงาน Phase 3:** P3-1 → P3-2 → P3-3 (README อธิบาย seed) · Playwright รอ C3/C4 · fresh-clone rehearsal (ผู้ใช้) ท้ายสุด
 ผู้ใช้เป็นคน merge; AI ไม่ merge เอง · ทุก PR: เจ้าของเปิด → **Codex รีวิว** → ผู้ใช้อนุมัติ/merge
 
 ## 2. กติการ่วม (ทุก AI ต้องทำตาม)
@@ -53,10 +53,10 @@
 
 | เจ้าของ | แก้ได้ |
 |---|---|
-| **Claude** | ทั้ง repo `meeting-manager-frontend` · umbrella `docker-compose*.yml` ส่วน `web` |
-| **Cursor** | ทั้ง repo `meeting-manager-backend` (รวม `app.ts`, `config.ts`, `db/**`, `prisma/**`, `http/**`, `observability/**`, `test/helpers/**`, `docs/api-contract.md`, `package.json`) · umbrella `docker-compose*.yml` ส่วน `api`/`db` |
-| **Codex** | umbrella `docs/**`, `README.md` (umbrella + ทั้งสอง submodule), `AGENTS.md`/rules ร่วมกับผู้ใช้ · **ห้าม**แก้ `src/**`, `test/**`, `prisma/**`, contract |
-| ผู้ใช้ | `Makefile`, `.github/**`, ตัดสิน contract change |
+| **Claude** | ทั้ง repo `meeting-manager-frontend` (รวม `README.md`, `.github/**`) · umbrella `docker-compose*.yml` ส่วน `web`, `e2e/**`, workflow E2E/compose smoke ใน umbrella `.github/**` |
+| **Cursor** | ทั้ง repo `meeting-manager-backend` (รวม `app.ts`, `config.ts`, `db/**`, `prisma/**`, `http/**`, `observability/**`, `test/helpers/**`, `docs/api-contract.md`, `package.json`, `README.md`, `.github/**`) · umbrella `docker-compose*.yml` ส่วน `api`/`db`, target `seed` ใน `Makefile` |
+| **Codex** | umbrella `docs/**`, umbrella `README.md`, `AGENTS.md`/rules ร่วมกับผู้ใช้ · **ห้าม**แก้ `src/**`, `test/**`, `prisma/**`, contract |
+| ผู้ใช้ | `Makefile` (นอกจาก target ที่ระบุข้างบน), ตัดสิน contract change |
 
 - **Contract change** (`backend/docs/api-contract.md`): Cursor เปิด PR `contract: ...` แยก → Codex รีวิว → ผู้ใช้อนุมัติ → แจ้ง Claude ด้วยลิงก์ PR
 - Claude ต้องการ endpoint/field ใหม่ → เขียน "Contract change request" ใน PR ของ frontend หรือแจ้งผู้ใช้ ไม่แก้ backend เอง
@@ -90,9 +90,13 @@ REVIEW (for each PR the user gives you)
   (blocker / should-fix / nit), the concrete failure scenario, and a suggested fix. Write it so the user can paste it as a PR comment.
 - Never push to someone else's branch and never merge.
 
-DOCS (own branch docs/<desc> in the umbrella or a submodule, one PR each)
-- Keep README accurate: setup (make init/up/dev, DB_PORT, Node 24), env vars, demo account + mock OTP 112233,
-  API summary (link the contract), architecture + decisions (link ADRs), security and operations, limitations, future work (guest role).
+DOCS (own branch docs/<desc> in the umbrella, one PR each)
+- Cursor writes backend/README.md and Claude writes frontend/README.md. You review them: check every command, env var
+  and default against the code and compose files, and flag anything not true.
+- You own the umbrella README.md: overview, setup (make init/up/dev/seed, DB_PORT, Node 24), demo account + mock OTP 112233,
+  links to both submodule READMEs, architecture + decisions (link ADRs), limitations (mock OTP and demo seed must never be
+  enabled on a real server), future work (guest role).
+- Phase 3 reviews: P3-1 must make the seed impossible to run on a production server without ALLOW_DEMO_SEED=true.
 - Update docs when merged code changes behaviour; flag drift between code, contract and ADRs as review findings.
 - English for README/code docs; Thai is fine in docs/discussion.
 ```
@@ -108,14 +112,17 @@ Rules that still apply: backend/AGENTS.md patterns; the contract is the source o
 contract changes go in a separate PR titled "contract: ..." and must be announced (the frontend depends on it).
 Schema changes: edit prisma/schema.prisma, run `npm run db:migrate` (review the generated SQL before committing), never edit merged migrations.
 
-Your queue:
-1. B1 (PR #7): finish per Codex/user review.
-2. B2 feature/ws-b-2-login-sessions: login + OTP (LOGIN), session cookie, logout, GET /auth/me,
-   implement createAuthenticate (src/modules/auth/authenticate.ts). After merge every /api/v1 route works with a real session.
-   Add a test helper that logs in through the real flow alongside the existing loginAs() stub.
-3. B3 feature/ws-b-3-reset-ratelimit: forgot/reset password, revoke sessions, auth rate limits.
-4. `make seed`: demo user (verified, password documented in README by Codex) + candidates + meetings around today.
-5. Follow-ups: log a fatal JSON line when config validation fails at startup (ADR-012).
+Done: B1-B3, PATCH inline candidate, demo seed, fatal config log (PRs #10-#15).
+Phase 3 queue (one PR each, in this order):
+P3-1 make seed. Backend: seed-cli refuses (exit 1, one JSON error line) when NODE_ENV=production and
+     ALLOW_DEMO_SEED!=true; idempotent; never run from CMD or migrations; tests for both. Then an umbrella PR:
+     `make seed` runs it in the running api container for make dev and make up (passes ALLOW_DEMO_SEED=true),
+     clear error if the api container is not running.
+P3-2 CI: `npm audit --audit-level=high` in the workflow + .github/dependabot.yml (npm, github-actions, docker; weekly).
+     Run the audit locally first; if it fails, upgrade in a separate PR first. Never lower the level.
+P3-3 backend/README.md: setup, every env var with defaults and production requirements, demo account + mock OTP,
+     tests (separate DB), API summary (link the contract), decisions (link ADRs), security and operations,
+     limitations (ALLOW_MOCK_OTP and ALLOW_DEMO_SEED never on a real server; a real OTP provider is needed), future work.
 DONE = typecheck + tests + build green; Conventional Commits in English; PR description with tests, trade-offs, open questions,
 and the "Auth & security" checklist (implementation-plan.md section 5) for auth PRs.
 ```
@@ -123,11 +130,11 @@ and the "Auth & security" checklist (implementation-plan.md section 5) for auth 
 ## 7. ส่วนของ Claude (frontend)
 
 1. ✅ Phase 1 (backend + web shell) · ✅ shared fixes หลังรีวิวของ Cursor · ✅ dev compose origin `:3001`
-2. **C1** auth pages — frontend PR #2 (รอรีวิว; ทดสอบ end-to-end หลัง B1/B2)
-3. **C2** Dashboard (list, filter, Mine/All, pagination, states) + Meeting form (candidate combobox, Onsite/Online, 409)
+2. ✅ **C1** auth pages — frontend PR #2
+3. ✅ **C2** Dashboard (list, filter, Mine/All, pagination, states) + Meeting form (candidate combobox, Onsite/Online, 409)
 4. **C3** Candidate Summary (info, notes/feedback, history, Edit/Cancel/Delete)
 5. **C4** Calendar (Week/Month, mobile Day agenda, popover, click-to-create)
-6. Phase 3 ฝั่ง frontend: ต่อ API จริงครบ, Playwright smoke (`make up`), ตรวจ CSP
+6. Phase 3: CI ของ frontend (audit + Dependabot), `frontend/README.md`, Playwright smoke บน `make up` + `make seed` ใน umbrella (register → OTP → login → create → edit → two-tab 409 → cancel → delete → logout + ตรวจ CSP)
 - ใช้ Figma MCP (`get_screenshot` / `get_design_context` page `03 Screens`, file `umgd40A9k9R8M2zhtk0Coj`) เป็น reference ทีละหน้า
 
 ## 8. การส่งต่องาน / สื่อสาร
