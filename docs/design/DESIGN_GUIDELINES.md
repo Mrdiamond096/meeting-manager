@@ -61,7 +61,34 @@ Status มี 3 ค่าเท่านั้น (PENDING / CONFIRMED / CANCELL
 ข้อห้าม: ห้ามใช้ `brand` (Yolk) เป็นสีตัวอักษรบนพื้นขาว เพราะ contrast ไม่ผ่าน ให้ใช้เป็นพื้นหลังหรือ indicator เท่านั้น
 
 ### Dark mode
-ใช้ class `.dark` ที่ `<html>` โดยมี token ครบทุกตัวแล้วใน globals.css เป็น optional สำหรับงานนี้ ทำ light ให้ดีก่อน
+ใช้ class `.dark` ที่ `<html>` (Tailwind `@custom-variant dark`) โดย `next-themes` ใน `src/app/providers.tsx` ใส่ class ให้อัตโนมัติตามธีมของระบบ (`defaultTheme="system"` อ่าน `prefers-color-scheme`) เปลี่ยน Dark Mode ใน macOS/iOS/Android แล้วเว็บเปลี่ยนตามทันทีโดยไม่ต้องรีโหลด ผู้ใช้เลือกเองได้ที่ปุ่มธีม (`ThemeSwitch` ใน `src/components/shell/theme-switch.tsx`) ข้าง EN/TH บน header และหน้า auth มี 3 ตัวเลือก Light / Dark / System (ค่าเริ่มต้น System) ค่าที่เลือกเก็บใน localStorage key `theme` ค่า token อยู่ใน `.dark { ... }` ของ `tokens/globals.css` และ `frontend/src/app/globals.css` (สองไฟล์นี้ต้องตรงกัน)
+
+| Token | Light | Dark |
+|---|---|---|
+| background | `#F7F8FA` | `#0E131A` |
+| foreground / card-foreground | `#141A24` | `#E8ECF1` |
+| card / popover | `#FFFFFF` | `#151B24` |
+| primary / ring | `#1F7A6D` | `#3FB8A6` |
+| primary-foreground | `#FFFFFF` | `#06201C` |
+| brand (Yolk) / brand-foreground | `#F4B23E` / `#1F2937` | เหมือน light |
+| secondary / muted / info-subtle | `#EEF1F5` | `#1D2530` |
+| secondary-foreground | `#1F2937` | `#E8ECF1` |
+| muted-foreground | `#5F6B7A` | `#93A0B0` |
+| accent / accent-foreground | `#E8F3F1` / `#134E46` | `#16302C` / `#B8ECE3` |
+| border / input | `#E3E6EB` / `#D5DAE1` | `#263040` / `#2E3A4C` |
+| success / success-subtle | `#1E6B3A` / `#E6F4EA` | `#6FCF8F` / `#12301D` |
+| warning / warning-subtle | `#8A5A00` / `#FDF3DC` | `#F4C26B` / `#332508` |
+| destructive / destructive-subtle | `#B42318` / `#FDECEA` | `#F2867A` / `#3A1512` |
+| destructive-foreground | `#FFFFFF` | `#1A0503` |
+| info | `#475467` | `#B4BFCC` |
+
+กติกาสำหรับ frontend:
+- ใช้ token เสมอ (`bg-card`, `text-muted-foreground`, `border-border` ฯลฯ) ห้าม hardcode `bg-white`, `text-black` หรือ hex ไม่งั้นสีจะไม่เปลี่ยนตอนเป็น dark
+- ปุ่ม primary ใน dark เป็นสีอ่อน (`#3FB8A6`) ตัวอักษรบนปุ่มจึงเป็นสีเข้ม ให้ใช้ `text-primary-foreground` เสมอ ห้ามใส่ `text-white`
+- Overlay ของ Dialog/AlertDialog ใช้ดำ 60% (`bg-black/60`) ทั้งสองธีม
+- Header ยังใช้พื้น Yolk และโลโก้เดิมในทั้งสองธีม
+
+หน้าจอ dark ครบทุกหน้าอยู่ใน Figma page `04 Screens — Dark` (ใช้ variable mode `Dark` ของ collection `Color`) และมี PNG ตัวอย่างที่ `screens/dark/`
 
 ## 3. Typography
 
@@ -184,7 +211,7 @@ Status มี 3 ค่าเท่านั้น (PENDING / CONFIRMED / CANCELL
 
 ## 10. Workflow: Figma ↔ Code
 1. สร้าง Figma Variables จาก `tokens/tokens.json` (collection `color` มี 2 modes: Light/Dark และ collection `radius`/`spacing`)
-2. วาดหน้าจอตามข้อ 6 (desktop 1440 + mobile 390, EN/TH) ด้วย component ที่ผูก variable ไว้ แล้ว export PNG ไว้ที่ `docs/design/screens/` — แผนเต็มอยู่ที่ `docs/discussion/finally/figma-design-plan.md`
+2. วาดหน้าจอตามข้อ 6 (desktop 1440 + mobile 390, EN/TH) ด้วย component ที่ผูก variable ไว้ แล้ว export PNG ไว้ที่ `docs/design/screens/` (dark อยู่ที่ `screens/dark/`, Figma page `04 Screens — Dark`) — แผนเต็มอยู่ที่ `docs/discussion/finally/figma-design-plan.md`
 3. ฝั่งโค้ด: `npx shadcn@latest init` → แทน `src/app/globals.css` ด้วย `tokens/globals.css` → `npx shadcn@latest add button input label select textarea calendar popover radio-group toggle-group badge card dialog alert-dialog pagination skeleton sonner avatar`
 4. เพิ่ม Badge variants `success | warning | destructive | info` (info ใช้กับ Past) ใน `components/ui/badge.tsx` ให้ map กับตารางสถานะข้อ 2
 5. เมื่อเปลี่ยนสีใด ให้แก้ทั้ง `globals.css` และ `tokens.json` ใน commit เดียวกัน
