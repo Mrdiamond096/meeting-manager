@@ -6,14 +6,16 @@
 
 | AI | บทบาท | Repo | งานที่เหลือ |
 |---|---|---|---|
-| **Claude** | **Frontend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง frontend) | `meeting-manager-frontend` `feature/ws-c-*` ✅ C1, C2 → C3 Candidate Summary → C4 Calendar; Phase 3: CI ของ frontend (audit + Dependabot), README ของ frontend, Playwright smoke + compose smoke ใน umbrella |
-| **Cursor** | **Backend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง backend ด้วย) | `meeting-manager-backend` `feature/ws-b-*`, `fix/*` ✅ B1–B3, seed, fatal config log → Phase 3: P3-1 `make seed` (guard + Makefile), P3-2 CI ของ backend (audit + Dependabot), P3-3 README ของ backend; ดูแล contract, schema, `app.ts`; แก้ backend ตามรีวิว |
+| **Claude** | **Frontend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง frontend) | `meeting-manager-frontend` `feature/ws-c-*` | ✅ C1, C2 → C3 Candidate Summary → C4 Calendar; Phase 3: CI ของ frontend (audit + Dependabot), README ของ frontend, Playwright smoke + compose smoke ใน umbrella |
+| **Cursor** | **Backend** ทั้งหมด (เจ้าของไฟล์ร่วมฝั่ง backend ด้วย) | `meeting-manager-backend` `feature/ws-b-*`, `fix/*` | ✅ B1–B3, seed, fatal config log → Phase 3: P3-1 `make seed` (guard + Makefile), P3-2 CI ของ backend (audit + Dependabot), P3-3 README ของ backend; ดูแล contract, schema, `app.ts`; แก้ backend ตามรีวิว |
 | **Codex** | **Reviewer + docs** — ไม่เขียน feature code | ทุก repo (อ่าน) · umbrella `docs/`, umbrella `README.md` | รีวิวทุก PR ก่อนผู้ใช้ (README ทุกฉบับ: ตรวจทุก command/env/default เทียบกับโค้ด); umbrella README + docs ส่วนกลาง; อัปเดต docs ให้ตรงโค้ดจริง |
 
 ประวัติ: Phase 1 (Claude) และ WS-A A1–A3 (Codex) merge แล้ว — backend PR #1–#6 · Prisma #9 · B1–B3 #10–#12 · PATCH inline candidate #13 · seed #14 · fatal config log #15 · frontend C1 #2, C2 #4–#6
 
 **ลำดับงาน Phase 3:** P3-1 → P3-2 → P3-3 (README อธิบาย seed) · Playwright รอ C3/C4 · fresh-clone rehearsal (ผู้ใช้) ท้ายสุด
 ผู้ใช้เป็นคน merge; AI ไม่ merge เอง · ทุก PR: เจ้าของเปิด → **Codex รีวิว** → ผู้ใช้อนุมัติ/merge
+
+> v4 มีผลเหนือกติกา ownership เดิมใน `AGENTS.md` ของ submodule จนกว่า PR อัปเดต AGENTS ของทั้งสอง repo จะ merge และผูก submodule commit แล้ว
 
 ## 2. กติการ่วม (ทุก AI ต้องทำตาม)
 
