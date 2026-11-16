@@ -179,7 +179,7 @@ helmet, `express.json({ limit: '100kb' })`, Zod strict, parameterized query (Pri
 |---|---|---|---|
 | D1 | Scope: core CRUD gate → thin candidate journey; ไม่มี rating/COMPLETED/users | A + B | [ADR-001](./adr/ADR-001-scope.md) |
 | D2 | Stack: React/TS/Vite + Express 5/TS + PG16, Node 24 LTS | A, B, R | [ADR-002](./adr/ADR-002-stack-runtime.md) |
-| D3 | Prisma ORM + `prisma migrate` SQL migrations committed (เปลี่ยนจาก Drizzle: ผู้พัฒนาคุ้นเคย, คาดว่าทีมใช้) | A → revised | [ADR-003](./adr/ADR-003-data-access.md) |
+| D3 | Prisma ORM + `prisma migrate` SQL migrations committed (เปลี่ยนจาก Drizzle: ผู้พัฒนาคุ้นเคยและทีมใช้ Prisma) | A → revised | [ADR-003](./adr/ADR-003-data-access.md) |
 | D4 | Contract: backend Zod authority, frontend types แยก | New | [ADR-004](./adr/ADR-004-contract-sharing.md) |
 | D5 | `dueDate` = start instant + optional `endAt`; RFC 3339 offset in, UTC out | B | [ADR-005](./adr/ADR-005-datetime.md) |
 | D6 | Candidate identity ด้วย ID, explicit create | B | [ADR-006](./adr/ADR-006-candidate-identity.md) |

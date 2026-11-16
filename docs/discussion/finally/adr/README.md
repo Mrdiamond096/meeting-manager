@@ -6,7 +6,7 @@
 |---|---|---|
 | [001](./ADR-001-scope.md) | Product scope | Medium |
 | [002](./ADR-002-stack-runtime.md) | Stack และ runtime | High |
-| [003](./ADR-003-data-access.md) | Data access + migrations (Prisma — revised จาก Drizzle) | Medium |
+| [003](./ADR-003-data-access.md) | Data access + migrations (Prisma — revised จาก Drizzle) | Accepted |
 | [004](./ADR-004-contract-sharing.md) | Contract sharing ข้าม submodule | Medium |
 | [005](./ADR-005-datetime.md) | Date/time contract | Medium |
 | [006](./ADR-006-candidate-identity.md) | Candidate identity | High |
