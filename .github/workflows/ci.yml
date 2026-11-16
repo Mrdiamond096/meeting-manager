@@ -17,8 +17,7 @@ jobs:
           submodules: recursive
       - run: cp .env.example .env
       - run: docker compose up -d --build --wait
-      - run: curl -fsS http://localhost:8080/api/health/ready
-      - run: curl -fsS http://localhost:8080 | grep -q "Upcoming Meetings"
+      - run: scripts/smoke.sh http://localhost:8080
       - if: failure()
         run: docker compose logs
       - if: always()
