@@ -67,7 +67,7 @@ flowchart LR
 
 | เรื่อง | ข้อเสนอ | เหตุผล |
 |---|---|---|
-| Layering | `routes` (HTTP, parse) → `services` (rules, version, transitions) → `repositories` (Drizzle) | ตามที่อนุมัติแล้ว; test service ได้โดยไม่มี HTTP |
+| Layering | `routes` (HTTP, parse) → `services` (rules, version, transitions) → `repositories` (Prisma) | ตามที่อนุมัติแล้ว; test service ได้โดยไม่มี HTTP |
 | Validation | Zod `.strict()` ทุก body/query/params; UUID ใน path ตรวจก่อนถึง DB | กัน mass assignment, กัน DB error 500 จาก UUID ผิดรูป |
 | Error model | `{ error: { code, message, details?, requestId } }` + status ที่ถูกต้อง; `AppError` class เดียว; error middleware ตัวเดียว map Zod→400, NotFound→404, VersionConflict→409, BodyTooLarge→413, อื่น ๆ→500 | client handle ได้จาก `code` ไม่ต้อง parse message |
 | 500 | ข้อความทั่วไป "Internal error" + `requestId`; stack อยู่ใน log เท่านั้น | ไม่รั่วรายละเอียดภายใน |
@@ -88,7 +88,7 @@ flowchart LR
 
 | ความเสี่ยง (OWASP Top 10 2021) | Control | ที่ไหน | ระดับ |
 |---|---|---|---|
-| A03 Injection (SQL) | Drizzle parameterized queries; ห้าม `sql.raw` กับ input | api | **Must** |
+| A03 Injection (SQL) | Prisma parameterized queries; raw SQL ผ่าน tagged `$queryRaw` เท่านั้น ห้าม `$queryRawUnsafe` กับ input | api | **Must** |
 | A03 Injection (XSS) | React escape อัตโนมัติ; **ห้าม** `dangerouslySetInnerHTML`; description แสดงแบบ plain text (`white-space: pre-wrap`) | web | **Must** |
 | A04 Insecure design / mass assignment | Zod strict, reject `id`/`version` ผิดที่/timestamps; PATCH ว่าง → 400 | api | **Must** |
 | A05 Misconfiguration | `helmet()` (มีแล้ว), ปิด `x-powered-by` (มีแล้ว), Next `poweredByHeader: false`, ไม่ publish port api/db ใน prod compose (เป็นแล้ว), container non-root (เป็นแล้ว) | api, web, compose | **Must** |
@@ -135,7 +135,7 @@ flowchart LR
 | `error` | request ล้มเพราะฝั่งเรา (5xx) หรือ error ที่ไม่คาดคิด | unhandled exception, DB timeout |
 | `warn` | ผิดปกติแต่ระบบรับมือได้ / สัญญาณ abuse | 429 rate limited, readiness ล้ม (DB down), 413 |
 | `info` | วงจรชีวิตและ access log | server start/stop, หนึ่งบรรทัดต่อ request (method, route, status, durationMs, requestId) |
-| `debug` | รายละเอียดสำหรับ dev | ค่า query ที่ parse แล้ว (ไม่มีข้อมูลส่วนตัว), SQL ที่ Drizzle สร้าง |
+| `debug` | รายละเอียดสำหรับ dev | ค่า query ที่ parse แล้ว (ไม่มีข้อมูลส่วนตัว), SQL ที่ Prisma สร้าง |
 | `trace` | ไม่ใช้ | — |
 
 **การตัดสินใจที่ต้อง discuss:** 4xx (400/404/409/422) log เป็น `info` ไม่ใช่ `warn` — เพราะเป็นพฤติกรรมปกติของ client (validation ไม่ผ่าน, version conflict) ถ้าเป็น `warn` จะกลบสัญญาณจริง ยกเว้น 413/429 ที่บ่งชี้ abuse
