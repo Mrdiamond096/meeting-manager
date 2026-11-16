@@ -1,5 +1,7 @@
 # 5. Proposed Solution Approaches
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 ### Approach A — Minimal MVP
 Single Express app (JS or TS) serving a static React build; SQLite file or JSON; generic meeting model only (title/description/dueDate/status); Docker single container; no tests beyond a few; no auth.
 Misses the wireframes → looks like it ignored half the brief.

@@ -1,5 +1,7 @@
 # 7. Recommended Technology Stack
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 Respecting the allowed list (React/Vue, Express/FastAPI/Flask).
 
 | Concern | Choice | Why | Rejected (why) |

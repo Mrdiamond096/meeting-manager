@@ -1,5 +1,7 @@
 # 19. Trade-offs and Rejected Alternatives
 
+> **Historical proposal.** Data access was later changed from Drizzle to Prisma — see [ADR-003](../../../discussion/finally/adr/ADR-003-data-access.md).
+
 - **Superset model vs strict generic meeting:** more fields/tests, but covers both rubrics.
 - **Postgres vs SQLite:** SQLite is simpler and would pass, but a real DB container and proper types/constraints better match "Frontend, Backend, and Database" containerisation. Cost: one more service + healthchecks. *Fallback if time-pressed: SQLite file on volume (repo layer isolates the change).*
 - **Monorepo with shared package vs separate repos:** shared Zod contract prevents drift; cost is build wiring.

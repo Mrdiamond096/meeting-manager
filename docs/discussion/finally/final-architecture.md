@@ -26,7 +26,7 @@ Modular monolith สามชิ้นที่ deploy เป็น container �
 | **Fact (mandatory)** | CRUD meeting (title, description, due date, status) · list มี pagination · persist · React/Vue · Express/FastAPI/Flask · REST · README · container FE+BE+DB · deploy · public GitHub |
 | **Fact (wireframe — ไม่ได้ระบุว่า optional)** | Dashboard card, Booking form, Candidate Summary |
 | **Fact (optional)** | Login/guest, design file, tests, CI/CD |
-| **Preference (ของเรา)** | TypeScript, Drizzle, Tailwind/shadcn, TanStack Query, optimistic locking, Node 24, Compose บน VM |
+| **Preference (ของเรา)** | TypeScript, Prisma, Tailwind/shadcn, TanStack Query, optimistic locking, Node 24, Compose บน VM |
 
 ---
 
@@ -230,7 +230,7 @@ helmet, `express.json({ limit: '100kb' })`, Zod strict, parameterized query (Pri
 
 ## 15. Implementation sequence (ย่อ — รายละเอียดใน implementation-plan.md)
 
-1. Spike: Node 24 pin, FE → TS + Tailwind, Drizzle + migration แรก, deploy hello-world ไป target
+1. Spike: Node 24 pin, FE → TS + Tailwind, Prisma + migration แรก, deploy hello-world ไป target
 2. Core CRUD API + tests (gate)
 3. Core UI: list/form/edit/delete + pagination (gate: mandatory ครบ local)
 4. Full compose + deploy จริง (gate: mandatory ครบ public)
