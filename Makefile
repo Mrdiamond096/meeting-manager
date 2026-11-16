@@ -63,6 +63,10 @@ test-frontend: ## Frontend tests
 test-docker: ## Run all tests inside dev containers
 	$(COMPOSE_DEV) run --rm --no-deps api npm test
 	$(COMPOSE_DEV) run --rm --no-deps web npm test
+seed: ## Reset and load the demo data into the running stack (log in as demo@example.com, see backend README)
+	@$(COMPOSE) ps --status running --services 2>/dev/null | grep -qx api || { \
+	  echo "make seed: the api container is not running. Start the stack first with 'make dev' or 'make up'." >&2; exit 1; }
+	$(COMPOSE) exec -T -e ALLOW_DEMO_SEED=true api npm run db:seed
 health: ## Smoke check the running stack
 	@curl -fsS http://localhost:$(or $(WEB_PORT),8080)/api/health && echo
 
@@ -73,4 +77,4 @@ prune: clean ## clean + remove locally built images
 	$(COMPOSE) down --rmi local
 
 .PHONY: help init update install up down build restart ps logs dev dev-down up-backend up-frontend \
-        build-backend build-frontend shell-api db-shell test test-backend test-frontend test-docker health clean prune
+        build-backend build-frontend shell-api db-shell seed test test-backend test-frontend test-docker health clean prune
