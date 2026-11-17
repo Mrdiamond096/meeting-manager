@@ -1,0 +1,56 @@
+# Render Blueprint: the API and the web app as two free Docker web services, each built from its own repo.
+# The database is Neon (free PostgreSQL); Render's free PostgreSQL expires after 30 days.
+# Setup and the values to fill in: docs/deploy/render.md
+services:
+  - type: web
+    name: meeting-manager-api
+    runtime: docker
+    plan: free
+    region: singapore
+    repo: https://github.com/Mrdiamond096/meeting-manager-backend
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health/ready
+    # CD: deploy each push to main once that commit's GitHub checks (CI) have passed.
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: DATABASE_URL # Neon direct connection string (not the -pooler host), with ?sslmode=require
+        sync: false
+      - key: ALLOWED_ORIGINS # the web service URL, e.g. https://meeting-manager-web.onrender.com
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+      - key: APP_VERSION
+        value: render
+      # Demo only: there is no real OTP provider yet. The production image refuses the mock unless this is set;
+      # every login and registration accepts OTP_MOCK_CODE. Remove both once a real provider exists.
+      - key: OTP_PROVIDER
+        value: mock
+      - key: ALLOW_MOCK_OTP
+        value: "true"
+      - key: OTP_MOCK_CODE
+        value: "112233"
+
+  - type: web
+    name: meeting-manager-web
+    runtime: docker
+    plan: free
+    region: singapore
+    repo: https://github.com/Mrdiamond096/meeting-manager-frontend
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /login
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PORT
+        value: "10000"
+      # The API service URL, e.g. https://meeting-manager-api.onrender.com. Render passes env vars to the Docker
+      # build as build args, and Next bakes the /api rewrite in at build time: redeploy the web after changing it.
+      - key: API_URL
+        sync: false
