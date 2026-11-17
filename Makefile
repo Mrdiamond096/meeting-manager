@@ -80,4 +80,4 @@ prune: clean ## clean + remove locally built images
 	$(COMPOSE) down --rmi local
 
 .PHONY: help init update install up down build restart ps logs dev dev-down up-backend up-frontend \
-        build-backend build-frontend shell-api db-shell seed e2e testtest-backend test-frontend test-docker health clean prune
+        build-backend build-frontend shell-api db-shell seed e2e test test-backend test-frontend test-docker health clean prune
