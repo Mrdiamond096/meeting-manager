@@ -77,8 +77,8 @@ test-backend: ## Backend tests
 	$(MAKE) -C backend test
 test-frontend: ## Frontend tests
 	$(MAKE) -C frontend test
-test-docker: ## Run all tests inside dev containers
-	$(COMPOSE_DEV) run --rm --no-deps api npm test
+test-docker: ## Run tests in containers, with an isolated backend database
+	$(MAKE) -C backend test-docker
 	$(COMPOSE_DEV) run --rm --no-deps web npm test
 seed: ## Reset and load the demo data (log in as demo@example.com, see backend README)
 	@if $(COMPOSE) ps --status running --services 2>/dev/null | grep -qx api; then \
