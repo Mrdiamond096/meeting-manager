@@ -19,6 +19,15 @@ meeting-manager/                  <- this repo (compose, Makefile, CI)
 
 See the [documentation index](docs/README.md) for the requirements, design and API specification.
 
+## Live demo
+
+**https://meeting-manager-web.onrender.com**: log in as `demo@example.com` / `demo-password-123`, OTP `112233`.
+
+Hosted on Render (free) with Neon PostgreSQL in Singapore; the API is
+`https://meeting-manager-api-rnwg.onrender.com`. Free services sleep after 15 minutes idle, so the first request can
+take 30–60 s. OTP is a demo mock: every account accepts `112233`. Setup, CD and the demo-only settings are in
+[docs/deploy/render.md](docs/deploy/render.md).
+
 ## Clone
 
 ```bash

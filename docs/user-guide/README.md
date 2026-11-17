@@ -21,6 +21,7 @@
 
 | วิธีรัน | คำสั่ง | เปิดที่ |
 |---|---|---|
+| ใช้งานออนไลน์ (demo) | ไม่ต้องติดตั้ง | https://meeting-manager-web.onrender.com |
 | พัฒนา (hot reload) | `make dev` | http://localhost:3001 |
 | เหมือน production ใน Docker | `make up` | http://localhost:8080 |
 
