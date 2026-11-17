@@ -27,11 +27,11 @@ db: ## Start only PostgreSQL in docker -> localhost:5432
 	$(COMPOSE_DEV) up -d --wait db
 dev: db ## Hot reload with npm: web :3001 -> api :3000 -> db in docker (Ctrl-C stops both)
 	@[ -d backend/node_modules ] && [ -d frontend/node_modules ] || $(MAKE) --no-print-directory install
-	cd backend && DATABASE_URL='$(DB_URL)' npx prisma generate >/dev/null && DATABASE_URL='$(DB_URL)' npx prisma migrate deploy
+	cd backend && DATABASE_URL="$$DB_URL" npx prisma generate >/dev/null && DATABASE_URL="$$DB_URL" npx prisma migrate deploy
 	@printf '\n  Open http://localhost:3001  (the API on :3000 has no page of its own)\n\n'
 	@$(MAKE) --no-print-directory -j2 dev-api dev-web
 dev-api: ## API only, npm + tsx watch (needs make db)
-	cd backend && NODE_ENV=development PORT=3000 DATABASE_URL='$(DB_URL)' ALLOWED_ORIGINS=http://localhost:3001 \
+	cd backend && NODE_ENV=development PORT=3000 DATABASE_URL="$$DB_URL" ALLOWED_ORIGINS=http://localhost:3001 \
 	  COOKIE_SECURE=false LOG_PRETTY=true OTP_PROVIDER=mock OTP_MOCK_CODE=$(or $(OTP_MOCK_CODE),112233) npm run dev
 dev-web: ## Web only, next dev (needs the API on :3000)
 	cd frontend && API_URL=http://localhost:3000 npm run dev
@@ -82,7 +82,7 @@ seed: ## Reset and load the demo data (log in as demo@example.com, see backend R
 	@if $(COMPOSE) ps --status running --services 2>/dev/null | grep -qx api; then \
 	  $(COMPOSE) exec -T -e ALLOW_DEMO_SEED=true api npm run db:seed; \
 	elif $(COMPOSE) ps --status running --services 2>/dev/null | grep -qx db; then \
-	  cd backend && DATABASE_URL='$(DB_URL)' ALLOW_DEMO_SEED=true npm run db:seed; \
+	  cd backend && DATABASE_URL="$$DB_URL" ALLOW_DEMO_SEED=true npm run db:seed; \
 	else echo "make seed: start the stack first with 'make dev' or 'make up'." >&2; exit 1; fi
 e2e: ## Playwright smoke against the running stack (make up first)
 	cd e2e && npm ci --no-audit --no-fund && npx playwright install chromium
