@@ -7,7 +7,7 @@
 >
 > **Change 14 พ.ย. 2026:** auth (register, login + mock OTP 2FA, forgot password) อยู่ใน scope แล้ว ([ADR-009](./adr/ADR-009-auth.md)); การสื่อสาร/security/logging ตาม [ADR-011](./adr/ADR-011-api-communication.md)–[013](./adr/ADR-013-security-baseline.md); แผนงานล่าสุดคือ [implementation-plan v2](./implementation-plan.md) — ส่วนที่ขัดกันในเอกสารนี้ให้ถือ ADR เป็นหลัก
 
-อ่านคู่กับ [comparison-matrix.md](./comparison-matrix.md), [implementation-plan.md](./implementation-plan.md), [adr/](./adr/)
+อ่านคู่กับ [implementation-plan.md](./implementation-plan.md) และ [adr/](./adr/)
 
 ที่มาของแต่ละการตัดสินใจระบุเป็น **[A]** Claude, **[B]** Codex, **[C]** Cursor, **[R]** ข้อเท็จจริงจาก repo, **[New]** ข้อเสนอใหม่ในรีวิวนี้
 
