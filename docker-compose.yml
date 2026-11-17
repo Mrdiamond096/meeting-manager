@@ -22,6 +22,8 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8080}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      # Demo: a presentation registers more accounts from one machine than ADR-013's 3 per hour (max/minutes).
+      RATE_LIMIT_REGISTER: ${RATE_LIMIT_REGISTER:-100/60}
       # Local demo only: the production image refuses the mock OTP unless explicitly allowed (ADR-009).
       OTP_PROVIDER: mock
       OTP_MOCK_CODE: ${OTP_MOCK_CODE:-112233}

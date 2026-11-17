@@ -18,8 +18,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    // Registers one user through the UI and saves the session. One per run keeps it within the API's register limit
-    // (3 per IP per hour, ADR-013) for when that limit is on; it is switched off for the demo (backend auth/router.ts).
+    // Registers one user through the UI and saves the session. One per run stays within the API's register limit even
+    // at the ADR-013 value (3 per IP per hour); the demo stack raises it with RATE_LIMIT_REGISTER.
     { name: 'setup', testMatch: /auth\.setup\.ts/, use: { ...devices['Desktop Chrome'] } },
     {
       name: 'chromium',
