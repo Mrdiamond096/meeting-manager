@@ -43,6 +43,12 @@ make help     # every target
 without rebuilding an image. PostgreSQL runs in docker on :5432 (`make db`); migrations run before the API starts.
 Ctrl-C stops both; `make dev-down` stops the database. `make dev-api` / `make dev-web` start one side only.
 
+`make test` starts a separate disposable backend test database on `127.0.0.1:55432` and leaves the dev database
+untouched. It uses `TEST_DATABASE_URL`, not the application `DATABASE_URL`; direct backend `npm test` also requires
+an explicit test URL. See [backend test setup](backend/README.md#tests) for custom connections and port settings.
+Run `make -C backend test-down` to discard the test stack.
+
+
 Docker images are built in CI: each repo's pipeline builds its image, and this repo's CI starts the full stack with
 `docker compose` and runs the smoke test and Playwright against it. To run the same prod-like stack locally:
 
