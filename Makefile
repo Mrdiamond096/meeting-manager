@@ -28,6 +28,7 @@ db: ## Start only PostgreSQL in docker -> localhost:5432
 dev: db ## Hot reload with npm: web :3001 -> api :3000 -> db in docker (Ctrl-C stops both)
 	@[ -d backend/node_modules ] && [ -d frontend/node_modules ] || $(MAKE) --no-print-directory install
 	cd backend && DATABASE_URL='$(DB_URL)' npx prisma generate >/dev/null && DATABASE_URL='$(DB_URL)' npx prisma migrate deploy
+	@printf '\n  Open http://localhost:3001  (the API on :3000 has no page of its own)\n\n'
 	@$(MAKE) --no-print-directory -j2 dev-api dev-web
 dev-api: ## API only, npm + tsx watch (needs make db)
 	cd backend && NODE_ENV=development PORT=3000 DATABASE_URL='$(DB_URL)' ALLOWED_ORIGINS=http://localhost:3001 \
