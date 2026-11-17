@@ -18,6 +18,8 @@
 3. **สถานะไม่พึ่งสีอย่างเดียว:** badge ต้องมีทั้งข้อความและไอคอนเสมอ
 4. **Mobile-first:** การ์ดเรียงหนึ่งคอลัมน์บนมือถือ เพิ่มเป็นสองถึงสามคอลัมน์บนจอใหญ่
 5. **ทุก state มีหน้าตา:** loading (skeleton), empty (มี CTA), error (มีปุ่ม Retry), disabled และ pending
+   - Action ที่รอ API แสดง spinner และปิดปุ่มระหว่างทำงาน กลับมากดได้เมื่อ error; OTP Verify/Resend ปิดพร้อมกันเพื่อไม่ให้ request แข่งกัน
+   - ระหว่างเปลี่ยนหน้าแสดง loading; ระหว่างโหลดรายการ/ปฏิทินใหม่ให้แสดงสถานะกำลังโหลดพร้อมข้อมูลเดิม ข้อความมี EN/TH และรองรับ reduced motion
 
 ## 2. สี
 
@@ -174,6 +176,9 @@ Status มี 3 ค่าเท่านั้น (PENDING / CONFIRMED / CANCELL
 - Meeting type: `RadioGroup` แบบ card (Onsite / Online) ถ้าเลือก Online จะแสดงช่องเลือก Zoom หรือ Google Meet
 - Notes: `Textarea` 4 แถว
 - Action bar ด้านล่างประกอบด้วย Cancel (`outline`) และ **Book Meeting** (`primary`, แสดง spinner ขณะส่ง)
+- Cancel จากฟอร์มที่เปิดผ่าน Calendar (ช่องวันเวลา ปุ่มสร้างนัด หรือปุ่ม + บนมือถือ) กลับปฏิทินวัน มุมมอง Week/Month และตัวกรอง status / Mine–Everyone เดิม รวมถึงหลังรีเฟรชฟอร์ม; เปิดสร้างจาก List ให้กลับหน้า List
+- Cancel ออกจากฟอร์มโดยไม่บันทึกข้อมูล ต่างจาก Cancel Meeting ที่เปลี่ยนสถานะนัดและต้องยืนยัน; บันทึกสำเร็จกลับ Dashboard แบบ List
+- Flow อ้างอิง: [Figma Design Plan §5](../discussion/finally/figma-design-plan.md#5-user-flows)
 - Validation แสดงใต้ field เป็น `text-destructive text-xs` ผูกกับ `aria-describedby`; end time ต้องมากกว่า start time
 
 ### 6.4 Candidate Summary

@@ -67,10 +67,15 @@ flowchart TD
   O -->|ผิด 5 ครั้ง / หมดอายุ| A
   D -->|Book Meeting| N[Schedule Meeting]
   N -->|เลือก candidate เดิม / สร้างใหม่| N
-  N -->|Book| S[Candidate Summary]
-  D -->|View Details| S
+  N -->|Cancel ไม่บันทึก| D
+  N -->|Book สำเร็จ| D
+  D -->|Calendar| K[Calendar: วัน มุมมอง และตัวกรองที่เลือก]
+  K -->|ช่องวันเวลา / Schedule Meeting / + บนมือถือ| NC[Schedule Meeting จาก Calendar]
+  NC -->|Cancel ไม่บันทึก: คืนวัน มุมมอง ตัวกรองเดิม| K
+  NC -->|Book สำเร็จ| D
+  D -->|View Details| S[Candidate Summary]
   S -->|Edit Meeting| E[Edit Meeting] -->|409| C[Conflict dialog → reload]
-  E -->|Save| S
+  E -->|Save สำเร็จ / Cancel ไม่บันทึก| D
   S -->|Cancel Meeting| S
   S -->|Delete| D
   S -->|Add Feedback| S
@@ -79,7 +84,20 @@ flowchart TD
 
 **Prototype ที่ลิงก์ให้กดได้:**
 - P1 Auth: Login → OTP → Dashboard (+ Register → OTP)
-- P2 Core: Dashboard → Book Meeting → Candidate Summary → Edit → Cancel
+- P2 Core: List → Schedule → Book สำเร็จ → List → Candidate Summary → Edit → Save สำเร็จ / Cancel → List
+- P3 Calendar: Calendar → Schedule → Cancel → Calendar เดิม; Book สำเร็จ → List
+
+**พฤติกรรมระหว่างรอและการกลับจากฟอร์ม**
+
+| เหตุการณ์ | ผลที่ผู้ใช้เห็น |
+|---|---|
+| กด action ที่ส่ง API | ปุ่มแสดง spinner และกดซ้ำไม่ได้ หาก error แสดงข้อความและกลับมากดได้ |
+| เปลี่ยนหน้า / โหลดข้อมูลใหม่ | แสดง loading; รายการและปฏิทินที่มีข้อมูลอยู่แล้วคงข้อมูลเดิมระหว่างรอ |
+| Calendar → Schedule → รีเฟรช → Cancel | กลับวัน มุมมอง Week/Month, status และ Mine/Everyone เดิม โดยไม่สร้างนัด |
+| List → Schedule → Cancel | กลับ List โดยไม่สร้างนัด |
+| Schedule → Book สำเร็จ | กลับ Dashboard แบบ List และแสดงผลบันทึกสำเร็จ |
+
+Diagram ด้านบนระบุพฤติกรรมปัจจุบันของแอป ภาพ export `user-flows.png` และ prototype ใน Figma ต้องปรับเส้นทางเดียวกันเมื่ออัปเดตไฟล์ออกแบบรอบถัดไป
 
 ## 6. วิธีทำ (ใช้ AI + Figma MCP)
 

@@ -12,6 +12,7 @@
 | Views | **Week** (time grid 07:00–20:00 เลื่อนดูได้ 00–24, คอลัมน์ จ.–อา., เส้นเวลาปัจจุบัน) และ **Month** (grid 6×7, แสดงสูงสุด 3 event/วัน + "+n more"); mobile ใช้ **Day agenda** แทน week |
 | Mine / All | toggle **Mine** (ค่าเริ่มต้น, `created_by = me`) / **All team**; ใช้ได้ทั้ง List และ Calendar — ownership ยังเป็นแบบทีม (ADR-009 ไม่เปลี่ยน, ใช้ `created_by` เป็น filter เพิ่ม) |
 | Interaction | คลิก event → S8 Candidate Summary · คลิกช่องว่าง → S7 นัดใหม่โดยเติมวันและเวลาเริ่มให้ (ปัดเป็น 30 นาที) · ปุ่ม Today / ‹ › · status filter ใช้ร่วมกับ List |
+| Cancel การสร้างนัด | ฟอร์มที่เปิดจาก Calendar กลับไปวัน มุมมอง Week/Month และตัวกรอง status / mine เดิม โดยไม่บันทึก; เก็บบริบทในลิงก์เปิดฟอร์มให้กลับได้หลังรีเฟรชด้วย ส่วนการสร้างจาก List ยังคงกลับ List |
 | สีของ event | ตาม status: Confirmed = success, Pending = warning, Cancelled = muted + ขีดฆ่า, Past = opacity ลด |
 | Timezone | แสดงตาม timezone ของ browser (ADR-005: เก็บเป็น instant UTC); header ระบุ timezone เช่น `GMT+7` |
 | API | ใช้ `GET /meetings` เดิม เพิ่ม `mine=true` และอนุญาต `from`/`to` โดยไม่ paginate เมื่อส่ง `view=range` (จำกัดช่วง ≤ 42 วัน, สูงสุด 500 รายการ) → 200 `{items}`; ช่วงเกิน → 400 |
