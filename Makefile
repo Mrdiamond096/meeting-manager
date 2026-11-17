@@ -2,6 +2,8 @@
 SHELL := /bin/bash
 
 -include .env
+# Demo register limit (ADR-013 is 3/60) for npm runs too, when .env predates it. Exported like everything else.
+RATE_LIMIT_REGISTER ?= 100/60
 export
 
 COMPOSE     := docker compose
