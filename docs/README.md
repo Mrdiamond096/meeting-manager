@@ -2,6 +2,7 @@
 
 | Document | Purpose |
 |---|---|
+| [User guide (Thai)](user-guide/README.md) | How to use every screen, with screenshots of the running app. |
 | [Assignment](requirement/20251009_Software%20Engineer_WebApp_Interview.md) | Original requirements. |
 | [API contract](../backend/docs/api-contract.md) | Request, response, validation and error specifications. |
 | [Architecture decisions](discussion/finally/adr/README.md) | Accepted decisions and the reasons for them. |
