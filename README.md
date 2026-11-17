@@ -33,11 +33,23 @@ Each sub-repo has its own `Dockerfile`, `docker-compose.yml` and `Makefile`, so 
 
 ```bash
 make init     # pull submodules + create .env
-make up       # full stack -> http://localhost:8080
-make dev      # hot-reload stack -> http://localhost:3001
+make dev      # day-to-day: npm with hot reload -> http://localhost:3001 (only the database runs in docker)
+make seed     # optional demo data (log in as demo@example.com)
 make test     # all tests
-make down
 make help     # every target
+```
+
+`make dev` runs the API (`tsx watch`, :3000) and the web app (`next dev`, :3001) with npm, so an edit shows up
+without rebuilding an image. PostgreSQL runs in docker on :5432 (`make db`); migrations run before the API starts.
+Ctrl-C stops both; `make dev-down` stops the database. `make dev-api` / `make dev-web` start one side only.
+
+Docker images are built in CI: each repo's pipeline builds its image, and this repo's CI starts the full stack with
+`docker compose` and runs the smoke test and Playwright against it. To run the same prod-like stack locally:
+
+```bash
+make up       # full stack in docker (prod build) -> http://localhost:8080
+make e2e      # Playwright against it
+make down
 ```
 
 ## Working with submodules
