@@ -18,6 +18,18 @@ Everything here is on free plans:
 
 Check the current free-tier terms on render.com and neon.tech before relying on them; they change.
 
+## Current deployment
+
+| | |
+|---|---|
+| Web | https://meeting-manager-web.onrender.com |
+| API | https://meeting-manager-api-rnwg.onrender.com (Render added `-rnwg`: the plain name was taken) |
+| Database | Neon project `meeting-manager`, AWS Singapore (`aws-ap-southeast-1`), branch `main`, direct (unpooled) connection |
+| Blueprint | `meeting-manager`, synced from `render.yaml` on `main` |
+
+The web's `API_URL` points at the suffixed API URL, and the API's `ALLOWED_ORIGINS` is the web URL. The demo data
+was loaded with the command in step 4. Check: `curl https://meeting-manager-web.onrender.com/api/health/ready`.
+
 ## 1. Neon: create the database
 
 1. Sign up at neon.tech, then create a project. Pick a region near the Render region, for example AWS Singapore
@@ -81,7 +93,8 @@ new version fails the health check, Render keeps the previous one live.
 
 - **OTP is the mock.** `ALLOW_MOCK_OTP=true` and every account accepts `112233`. Replace it with a real provider and
   remove both variables.
-- **The register rate limit is off** for the demo (backend `auth/router.ts`).
+- **Rate limits use the defaults** (register 3 per IP per hour, login 5 per IP and email per 15 minutes). Override
+  them with `RATE_LIMIT_<NAME>=max/minutes` on the API service if a demo needs more.
 - **All requests reach the API from the web service.** The per-IP part of rate limits sees the web service's IP, not
   each visitor's. Login stays limited per email.
 - **Free Neon has no point-in-time restore beyond its short history window**, so treat the data as disposable.
