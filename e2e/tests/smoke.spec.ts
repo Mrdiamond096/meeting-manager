@@ -28,6 +28,19 @@ test.describe('signed out', () => {
   });
 });
 
+test('cancelling a calendar booking returns to its original month and filters after a reload', async ({ page }) => {
+  const calendar = `/?view=calendar&mode=month&date=${tomorrow}&status=PENDING&mine=false`;
+  await page.goto(calendar);
+  await page.getByRole('link', { name: 'Schedule meeting', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Book meeting', exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(page).toHaveURL(new URL(calendar, page.url()).href);
+  await expect(page.getByRole('radio', { name: 'Month', exact: true })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('radio', { name: 'Pending', exact: true })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('radio', { name: 'Everyone', exact: true })).toHaveAttribute('aria-checked', 'true');
+});
+
 test.describe.serial('meeting life cycle', () => {
   test('book a meeting with a new candidate from a calendar slot', async ({ page }) => {
     await page.goto(`/?view=calendar&date=${tomorrow}`);
