@@ -67,6 +67,9 @@ seed: ## Reset and load the demo data into the running stack (log in as demo@exa
 	@$(COMPOSE) ps --status running --services 2>/dev/null | grep -qx api || { \
 	  echo "make seed: the api container is not running. Start the stack first with 'make dev' or 'make up'." >&2; exit 1; }
 	$(COMPOSE) exec -T -e ALLOW_DEMO_SEED=true api npm run db:seed
+e2e: ## Playwright smoke against the running stack (make up first)
+	cd e2e && npm ci --no-audit --no-fund && npx playwright install chromium
+	cd e2e && E2E_BASE_URL=http://localhost:$(or $(WEB_PORT),8080) npx playwright test
 health: ## Smoke check the running stack
 	@curl -fsS http://localhost:$(or $(WEB_PORT),8080)/api/health && echo
 
@@ -77,4 +80,4 @@ prune: clean ## clean + remove locally built images
 	$(COMPOSE) down --rmi local
 
 .PHONY: help init update install up down build restart ps logs dev dev-down up-backend up-frontend \
-        build-backend build-frontend shell-api db-shell seed test test-backend test-frontend test-docker health clean prune
+        build-backend build-frontend shell-api db-shell seed e2e test test-backend test-frontend test-docker health clean prune
