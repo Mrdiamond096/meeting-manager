@@ -11,11 +11,13 @@ meeting-manager/                  <- this repo (compose, Makefile, CI)
 ├── docker-compose.dev.yml        dev override: hot reload, ports 3001 / 3000 / 5432
 ├── Makefile
 └── docs/
+    ├── README.md                 documentation index
     ├── requirement/              original assignment brief
-    ├── design/                   design guidelines + tokens
-    ├── AI-thinks/                architecture proposals (claude / codex / cursor)
-    └── discussion/               cross-reviews, summary, final decision
+    ├── design/                   design guidelines, tokens and Figma screen exports
+    └── discussion/finally/       architecture, technical design and decision records
 ```
+
+See the [documentation index](docs/README.md) for the requirements, design and API specification.
 
 ## Clone
 
