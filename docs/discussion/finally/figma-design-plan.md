@@ -61,24 +61,26 @@
 ```mermaid
 flowchart TD
   A[Login] -->|email + password ถูก| O[OTP verify]
-  A -->|ไม่มีบัญชี| R[Register] --> O
+  A -->|ไม่มีบัญชี| R[Register: เลือก Recruiter หรือ Interviewer] --> O
   A -->|ลืมรหัส| F[Forgot password] --> RP[Reset: OTP + password ใหม่] --> A
   O -->|112233| D[Dashboard]
   O -->|ผิด 5 ครั้ง / หมดอายุ| A
-  D -->|Book Meeting| N[Schedule Meeting]
+  D -->|Book Meeting: Recruiter / Admin| N[Schedule Meeting]
+  N -->|เลือกผู้สัมภาษณ์หลายคน| ASG[รายชื่อผู้รับมอบหมาย]
+  ASG --> N
   N -->|เลือก candidate เดิม / สร้างใหม่| N
   N -->|Cancel ไม่บันทึก| D
   N -->|Book สำเร็จ| D
   D -->|Calendar| K[Calendar: วัน มุมมอง และตัวกรองที่เลือก]
-  K -->|ช่องวันเวลา / Schedule Meeting / + บนมือถือ| NC[Schedule Meeting จาก Calendar]
+  K -->|Recruiter / Admin: ช่องวันเวลา / Schedule / +| NC[Schedule Meeting จาก Calendar]
   NC -->|Cancel ไม่บันทึก: คืนวัน มุมมอง ตัวกรองเดิม| K
   NC -->|Book สำเร็จ| D
   D -->|View Details| S[Candidate Summary]
-  S -->|Edit Meeting| E[Edit Meeting] -->|409| C[Conflict dialog → reload]
+  S -->|Edit: Recruiter / Admin / ผู้ได้รับมอบหมาย| E[Edit Meeting] -->|409| C[Conflict dialog → reload]
   E -->|Save สำเร็จ / Cancel ไม่บันทึก| D
-  S -->|Cancel Meeting| S
-  S -->|Delete| D
-  S -->|Add Feedback| S
+  S -->|Cancel: Recruiter / Admin / ผู้ได้รับมอบหมาย| S
+  S -->|Delete: Admin หรือนัดที่ Recruiter สร้าง| D
+  S -->|Add Feedback: ทุกบทบาท แม้ไม่ได้รับมอบหมาย| S
   D -->|Logout| A
 ```
 
@@ -88,6 +90,8 @@ flowchart TD
 - P3 Calendar: Calendar → Schedule → Cancel → Calendar เดิม; Book สำเร็จ → List
 
 **พฤติกรรมระหว่างรอและการกลับจากฟอร์ม**
+
+สิทธิ์มอบหมายเป็นไปตาม [ADR-016](./adr/ADR-016-interviewer-assignments.md): Interviewer แก้/ยกเลิกเฉพาะนัดที่ได้รับมอบหมาย แต่ไม่สร้าง/ลบ/เปลี่ยนรายชื่อ เปิดนัดอื่นเป็นรายละเอียดแบบอ่านอย่างเดียวพร้อม feedback ตัวกรอง “มอบหมายให้ฉัน” ใช้การมอบหมาย ไม่ใช่ผู้สร้าง
 
 | เหตุการณ์ | ผลที่ผู้ใช้เห็น |
 |---|---|
