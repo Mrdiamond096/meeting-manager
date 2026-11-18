@@ -19,3 +19,4 @@
 | [013](./ADR-013-security-baseline.md) | Security baseline (nonce CSP, rate limits) | Accepted |
 | [014](./ADR-014-calendar-view.md) | Calendar view (Week + Month, Mine/All) | Accepted |
 | [015](./ADR-015-roles.md) | Roles: Admin / Recruiter / Interviewer | Accepted |
+| [016](./ADR-016-interviewer-assignments.md) | Assigned interviewers: edit/cancel assignments, team-wide feedback | Accepted |

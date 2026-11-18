@@ -53,12 +53,22 @@ flowchart LR
 erDiagram
   CANDIDATES ||--o{ MEETINGS : has
   MEETINGS ||--o{ FEEDBACK : receives
+  USERS ||--o{ MEETING_INTERVIEWERS : assigned
+  MEETINGS ||--o{ MEETING_INTERVIEWERS : has
+  USERS o|--o{ MEETINGS : creates
+  USERS { uuid id PK
+    varchar email
+    varchar role }
+  MEETING_INTERVIEWERS { uuid meeting_id PK,FK
+    uuid user_id PK,FK
+    timestamptz assigned_at }
   CANDIDATES { uuid id PK
     varchar name "1-120, ซ้ำได้"
     varchar position "จาก list คงที่"
     timestamptz created_at }
   MEETINGS { uuid id PK
     uuid candidate_id FK "nullable"
+    uuid created_by FK "nullable, creator audit"
     varchar title "1-150"
     text description "0-5000, not null"
     timestamptz due_date "เวลาเริ่ม"
@@ -76,11 +86,12 @@ erDiagram
 ```
 
 กติกา:
+- สิทธิ์ปัจจุบันและการมอบหมายดู [ADR-016](./adr/ADR-016-interviewer-assignments.md); session/OTP ดู ADR-009
 - `candidate_id` nullable → meeting แบบ generic (ตามโจทย์ core) ยังใช้ได้ [B]; booking form ของ wireframe บังคับมี candidate
 - **Identity ด้วย `candidateId` เท่านั้น** ฟอร์มให้ "เลือกคนเดิม" (autocomplete แสดงชื่อ+ตำแหน่ง+วันที่สร้าง) หรือ "สร้างใหม่" แบบ explicit ไม่ merge ตามชื่อ [B] — แก้ [A] §9 [ASM]
 - สร้าง candidate + meeting แรกใน transaction เดียว [B]
 - `candidates` ลบไม่ได้ใน scope นี้ (`ON DELETE RESTRICT`) [A][B]
-- ไม่มี `rating`, ไม่มี `COMPLETED`, ไม่มี `users` ใน baseline [B — ยอมรับใน summary ของ A]
+- ไม่มี `rating` และไม่มี `COMPLETED`; เพิ่ม `users` ตาม ADR-009 และการมอบหมายหลายต่อหลายตาม ADR-016
 - "Interview Notes" ใน wireframe = feedback entries แบบมี timestamp (append-only) [B] — **open question Q5**
 - Status transitions: `PENDING⇄CONFIRMED`, `PENDING|CONFIRMED→CANCELLED`, `CANCELLED→PENDING`; สร้างเป็น CANCELLED ไม่ได้; ผิดกติกา → `409` [B]
 - Cross-field: `provider` ต้อง null เมื่อ ONSITE; `end_at > due_date` เมื่อมี; ตรวจบน record ที่รวม patch แล้ว [B]
@@ -98,8 +109,9 @@ erDiagram
 
 | Method | Path | สำเร็จ | ข้อผิดพลาดหลัก |
 |---|---|---|---|
-| GET | `/meetings?page&pageSize&status&from&to&candidateId&mine` | 200 `{items, page, pageSize, total}` | 400 |
-| GET | `/meetings?view=range&from&to&status&mine` (ช่วง ≤ 42 วัน, ≤ 500 รายการ, ADR-014) | 200 `{items}` | 400 |
+| GET | `/meetings?page&pageSize&status&from&to&candidateId&mine&assignedToMe` | 200 `{items, page, pageSize, total}` | 400 |
+| GET | `/meetings?view=range&from&to&status&mine&assignedToMe` (ช่วง ≤ 42 วัน, ≤ 500 รายการ, ADR-014) | 200 `{items}` | 400 |
+| POST | `/interviewers/search` (Recruiter/Admin; JSON `{query}` keeps email out of URLs) | 200 `{items}`: verified id/email, max 50 | 400, 403 |
 | POST | `/meetings` | 201 + `Location` | 400, 404 (candidateId), 422 |
 | GET | `/meetings/:id` | 200 (รวม candidate, feedback) | 400, 404 |
 | PATCH | `/meetings/:id` (body มี `version`) | 200 | 400, 404, 409, 422 |

@@ -2,6 +2,8 @@
 
 **Status:** Accepted (ผู้ใช้ตัดสิน 14 พ.ย. 2026) · **Supersedes:** ฉบับเดิม "Auth ไม่อยู่ใน baseline"
 
+ส่วน ownership/roles ถูกแทนที่โดย [ADR-015](./ADR-015-roles.md) และ [ADR-016](./ADR-016-interviewer-assignments.md); session/OTP ยังคงตาม ADR นี้
+
 ## Context
 ผู้ใช้ตัดสินใจทำ login, register, forgot password และยืนยันตัวตนด้วย OTP แบบ mock (fixed code) ทั้งหมดอยู่ใน scope ของงาน (เดิมเป็น bonus); guest เลื่อนเป็น future work
 

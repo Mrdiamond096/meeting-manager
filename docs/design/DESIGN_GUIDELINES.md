@@ -172,6 +172,7 @@ Status มี 3 ค่าเท่านั้น (PENDING / CONFIRMED / CANCELL
 - ฟอร์มคอลัมน์เดียว `max-w-2xl` แบ่งเป็นกลุ่มด้วยหัวข้อ: Candidate · Schedule · Details
 - Candidate: `Combobox` ค้นหา candidate เดิม (แสดงชื่อ + ตำแหน่ง + วันที่สร้าง เพื่อแยกคนชื่อซ้ำ) และตัวเลือก **"+ Create new candidate"** แบบ explicit — ไม่ผูก candidate ด้วยชื่ออัตโนมัติ (ADR-006)
 - Position: `Select` (Software Engineer, Backend, Frontend, …)
+- กลุ่มผู้สัมภาษณ์: Recruiter/Admin เปิดตัวเลือก ค้นหาอีเมล และเลือกหลายบัญชีที่ยืนยันแล้วได้ มี loading/error/retry และนำชื่อออกก่อนบันทึกได้; Interviewer เห็นรายชื่อแบบอ่านอย่างเดียว
 - Date: `Popover` + `Calendar`; Start/End time: `Select` ทีละ 15 นาที วางคู่กันในแถวเดียว
 - Meeting type: `RadioGroup` แบบ card (Onsite / Online) ถ้าเลือก Online จะแสดงช่องเลือก Zoom หรือ Google Meet
 - Notes: `Textarea` 4 แถว
@@ -182,6 +183,7 @@ Status มี 3 ค่าเท่านั้น (PENDING / CONFIRMED / CANCELL
 - Validation แสดงใต้ field เป็น `text-destructive text-xs` ผูกกับ `aria-describedby`; end time ต้องมากกว่า start time
 
 ### 6.4 Candidate Summary
+- Interviewer มี Edit/Cancel เฉพาะนัดที่ได้รับมอบหมาย ไม่มี Delete และยังเพิ่ม feedback ในนัดอื่นได้ เปิด URL แก้นัดโดยไม่มีสิทธิ์ให้แสดงรายละเอียด/feedback แบบอ่านอย่างเดียว; นัด generic ใช้สิทธิ์เดียวกัน ตัวกรอง Interviewer ใช้ชื่อ “มอบหมายให้ฉัน” ([ADR-016](../discussion/finally/adr/ADR-016-interviewer-assignments.md))
 - Header: Avatar ใหญ่ + ชื่อ + role + status badge ของนัดล่าสุด ปุ่มทางขวาคือ Edit Meeting (`outline`), Cancel Meeting (`ghost` สี destructive), Add Feedback (`primary`)
 - Layout แบบ 2 คอลัมน์บน `lg` (ซ้าย 2/3, ขวา 1/3)
   - ซ้าย: **Meeting Info** (การ์ด) และ **Interview Notes / Feedback** (รายการที่มี timestamp + ช่องเพิ่ม feedback ใหม่ แบบ append-only)
