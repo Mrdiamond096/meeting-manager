@@ -111,7 +111,7 @@ erDiagram
 |---|---|---|---|
 | GET | `/meetings?page&pageSize&status&from&to&candidateId&mine&assignedToMe` | 200 `{items, page, pageSize, total}` | 400 |
 | GET | `/meetings?view=range&from&to&status&mine&assignedToMe` (ช่วง ≤ 42 วัน, ≤ 500 รายการ, ADR-014) | 200 `{items}` | 400 |
-| GET | `/interviewers?query=` (Recruiter/Admin) | 200 `{items}`: verified id/email, max 50 | 400, 403 |
+| POST | `/interviewers/search` (Recruiter/Admin; JSON `{query}` keeps email out of URLs) | 200 `{items}`: verified id/email, max 50 | 400, 403 |
 | POST | `/meetings` | 201 + `Location` | 400, 404 (candidateId), 422 |
 | GET | `/meetings/:id` | 200 (รวม candidate, feedback) | 400, 404 |
 | PATCH | `/meetings/:id` (body มี `version`) | 200 | 400, 404, 409, 422 |
