@@ -2,6 +2,8 @@
 
 **Status:** Accepted (ผู้ใช้ตัดสิน 14 พ.ย. 2026)
 
+การมอบหมายและสิทธิ์ของตัวกรอง Mine อัปเดตตาม [ADR-016](./ADR-016-interviewer-assignments.md)
+
 ## Context
 ผู้ใช้ต้องการหน้าแบบปฏิทิน (คล้าย Google Calendar) ที่ผูกกับวันและเวลาจริง เพื่อดูว่า meeting ของตัวเองอยู่วันไหน เวลาอะไร ADR-009 กำหนดให้ข้อมูลใช้ร่วมกันทั้งทีม และ `meetings.created_by` ใช้สำหรับ audit เท่านั้น
 
@@ -10,7 +12,7 @@
 |---|---|
 | ตำแหน่ง | Dashboard `/` มีตัวสลับ **List \| Calendar**; route `/?view=calendar&mode=week&date=2026-11-16` (deep-link ได้, จำค่าล่าสุดใน URL) |
 | Views | **Week** (time grid 07:00–20:00 เลื่อนดูได้ 00–24, คอลัมน์ จ.–อา., เส้นเวลาปัจจุบัน) และ **Month** (grid 6×7, แสดงสูงสุด 3 event/วัน + "+n more"); mobile ใช้ **Day agenda** แทน week |
-| Mine / All | toggle **Mine** (ค่าเริ่มต้น, `created_by = me`) / **All team**; ใช้ได้ทั้ง List และ Calendar — ownership ยังเป็นแบบทีม (ADR-009 ไม่เปลี่ยน, ใช้ `created_by` เป็น filter เพิ่ม) |
+| Mine / All | ค่าเริ่มต้นคือ Mine / All team ทั้ง List และ Calendar; Recruiter/Admin ใช้ `mine=true` ตามผู้สร้าง ส่วน Interviewer ใช้ `assignedToMe=true` ตามรายชื่อผู้รับมอบหมาย (ADR-016) |
 | Interaction | คลิก event → S8 Candidate Summary · คลิกช่องว่าง → S7 นัดใหม่โดยเติมวันและเวลาเริ่มให้ (ปัดเป็น 30 นาที) · ปุ่ม Today / ‹ › · status filter ใช้ร่วมกับ List |
 | Cancel การสร้างนัด | ฟอร์มที่เปิดจาก Calendar กลับไปวัน มุมมอง Week/Month และตัวกรอง status / mine เดิม โดยไม่บันทึก; เก็บบริบทในลิงก์เปิดฟอร์มให้กลับได้หลังรีเฟรชด้วย ส่วนการสร้างจาก List ยังคงกลับ List |
 | สีของ event | ตาม status: Confirmed = success, Pending = warning, Cancelled = muted + ขีดฆ่า, Past = opacity ลด |
